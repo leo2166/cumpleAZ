@@ -576,7 +576,7 @@ export default function Page() {
               </p>
             </div>
             {monthBirthdays.length > 0 ? (
-              <ul className="flex flex-wrap justify-center gap-x-6 gap-y-1.5">
+              <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
                 {[...monthBirthdays]
                   .sort((a, b) => parseDate(a.date).getDate() - parseDate(b.date).getDate())
                   .map(b => {
@@ -585,12 +585,16 @@ export default function Page() {
                     return (
                       <li
                         key={b.id}
-                        className={`font-serif text-base ${
-                          isToday ? 'font-bold text-[#c65b45]' : 'text-[#17254e]'
+                        className={`font-sans text-[15px] sm:text-base font-semibold transition-all ${
+                          isToday
+                            ? 'text-[#c65b45] bg-[#fde8df] px-2.5 py-0.5 rounded-lg shadow-2xs font-bold'
+                            : 'text-[#17254e]'
                         }`}
                       >
                         {isToday && '🎂 '}
-                        {`${d.getDate()}/${d.getMonth() + 1} — ${b.name}`}
+                        <span className="text-[#263b78] font-bold">{d.getDate()}/{d.getMonth() + 1}</span>
+                        <span className="mx-1 text-[#8b96b2] font-normal">—</span>
+                        <span>{b.name}</span>
                       </li>
                     )
                   })}
