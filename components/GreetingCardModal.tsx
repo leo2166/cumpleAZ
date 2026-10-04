@@ -72,18 +72,17 @@ export default function GreetingCardModal({
       .join('\n')
   }, [])
 
-  // Inicializar nombres cuando se abre el modal
+  // Inicializar nombres cuando se abre el modal: SOLO los que corresponden
   useEffect(() => {
     if (isOpen) {
       if (initialBirthdays.length > 0) {
         setNamesText(formatNames(initialBirthdays))
-      } else if (allMonthBirthdays.length > 0) {
-        setNamesText(formatNames(allMonthBirthdays.slice(0, 5)))
       } else {
-        setNamesText('María Pérez\nPedro Camejo\nGloria Casal\nOscar Pérez')
+        // No inventar ni tomar personas de otros días
+        setNamesText('')
       }
     }
-  }, [isOpen, initialBirthdays, allMonthBirthdays, formatNames])
+  }, [isOpen, initialBirthdays, formatNames])
 
   // Cargar imagen plantilla img2.png una sola vez
   useEffect(() => {
@@ -257,6 +256,26 @@ export default function GreetingCardModal({
     }, 'image/png')
   }
 
+  // Días únicos con cumpleañeros en el mes
+  const daysWithBirthdays = useMemo(() => {
+    const map = new Map<number, BirthdayItem[]>()
+    allMonthBirthdays.forEach(b => {
+      const parts = b.date.split('-')
+      const day = parseInt(parts[2], 10)
+      if (!map.has(day)) map.set(day, [])
+      map.get(day)!.push(b)
+    })
+    return Array.from(map.entries()).sort((a, b) => a[0] - b[0])
+  }, [allMonthBirthdays])
+
+  const selectSpecificDay = (dayNum: number) => {
+    const list = allMonthBirthdays.filter(b => {
+      const parts = b.date.split('-')
+      return parseInt(parts[2], 10) === dayNum
+    })
+    setNamesText(formatNames(list))
+  }
+
   const loadPreset = (type: 'today' | 'day' | 'month') => {
     if (type === 'today') {
       const today = new Date()
@@ -268,16 +287,11 @@ export default function GreetingCardModal({
       })
       if (todayList.length > 0) {
         setNamesText(formatNames(todayList))
+      } else {
+        setNamesText('')
       }
     } else if (type === 'day' && selectedDay !== null) {
-      const dayList = allMonthBirthdays.filter(b => {
-        const parts = b.date.split('-')
-        const d = parseInt(parts[2], 10)
-        return d === selectedDay
-      })
-      if (dayList.length > 0) {
-        setNamesText(formatNames(dayList))
-      }
+      selectSpecificDay(selectedDay)
     } else if (type === 'month') {
       setNamesText(formatNames(allMonthBirthdays))
     }
@@ -353,7 +367,7 @@ export default function GreetingCardModal({
             <div className="flex items-start justify-between pb-4 border-b border-[#eee8e1]">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#e87358]">
-                  Generador Oficial
+                  Generador Oficial (Solo Administrador)
                 </p>
                 <h3 className="font-serif text-2xl font-bold text-[#17254e]">
                   Tarjeta de Felicitación
@@ -372,25 +386,40 @@ export default function GreetingCardModal({
             <div className="mt-4 flex flex-col gap-1.5">
               <span className="text-xs font-semibold text-[#6f665f] flex items-center gap-1.5">
                 <Users className="size-3.5 text-[#263b78]" />
-                Cargar cumpleañeros rápidamente:
+                Cumpleañeros a incluir:
               </span>
-              <div className="flex flex-wrap gap-1.5">
-                {initialBirthdays.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 items-center">
+                {initialBirthdays.length > 0 ? (
                   <button
                     onClick={() => setNamesText(formatNames(initialBirthdays))}
                     className="rounded-lg bg-[#fde8df] px-2.5 py-1 text-xs font-semibold text-[#c65b45] hover:bg-[#fcdad0] transition"
                   >
                     🎂 Hoy ({initialBirthdays.length})
                   </button>
+                ) : (
+                  <span className="text-[11px] text-[#81776e] bg-[#f4f2ee] px-2 py-1 rounded-lg">
+                    Hoy no hay cumpleañeros
+                  </span>
                 )}
-                {selectedDay !== null && (
-                  <button
-                    onClick={() => loadPreset('day')}
-                    className="rounded-lg bg-[#edf0f8] px-2.5 py-1 text-xs font-semibold text-[#263b78] hover:bg-[#dfe4f4] transition"
+
+                {daysWithBirthdays.length > 0 && (
+                  <select
+                    onChange={e => {
+                      const val = Number(e.target.value)
+                      if (val) selectSpecificDay(val)
+                    }}
+                    defaultValue=""
+                    className="rounded-lg border border-[#ded7cf] bg-white px-2 py-1 text-xs text-[#17254e] font-medium outline-none focus:border-[#e87358]"
                   >
-                    Día {selectedDay}
-                  </button>
+                    <option value="" disabled>Seleccionar otro día…</option>
+                    {daysWithBirthdays.map(([dayNum, items]) => (
+                      <option key={dayNum} value={dayNum}>
+                        Día {dayNum} ({items.length} {items.length === 1 ? 'persona' : 'personas'})
+                      </option>
+                    ))}
+                  </select>
                 )}
+
                 {allMonthBirthdays.length > 0 && (
                   <button
                     onClick={() => loadPreset('month')}

@@ -15,6 +15,7 @@ import {
   Trash2,
   X,
   Share2,
+  LogOut,
 } from 'lucide-react'
 import GreetingCardModal from '@/components/GreetingCardModal'
 
@@ -62,6 +63,13 @@ function formatDisplayDate(dateStr: string): string {
 }
 
 function isTodayBirthday(dateStr: string, today: Date): boolean {
+  if (!dateStr) return false
+  const parts = dateStr.split('-')
+  if (parts.length === 3) {
+    const m = parseInt(parts[1], 10) - 1
+    const d = parseInt(parts[2], 10)
+    return d === today.getDate() && m === today.getMonth()
+  }
   const d = parseDate(dateStr)
   return d.getDate() === today.getDate() && d.getMonth() === today.getMonth()
 }
@@ -102,6 +110,7 @@ export default function Page() {
   // Admin state
   const [adminOpen, setAdminOpen] = useState(false)
   const [adminView, setAdminView] = useState<AdminView>('login')
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState(false)
   const [loginLoading, setLoginLoading] = useState(false)
@@ -136,16 +145,45 @@ export default function Page() {
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
 
-  // Greeting card modal state
+  // Greeting card modal state (solo activable por el administrador)
   const [cardModalOpen, setCardModalOpen] = useState(false)
   const [cardInitialBirthdays, setCardInitialBirthdays] = useState<Birthday[]>([])
   const [cardSelectedDay, setCardSelectedDay] = useState<number | null>(null)
 
   const openGreetingCard = (initialList: Birthday[] = [], day: number | null = null) => {
+    if (!isAdminLoggedIn) {
+      addToast('La tarjeta solo puede ser activada por el administrador con clave.', 'error')
+      setAdminOpen(true)
+      setAdminView('login')
+      return
+    }
     setCardInitialBirthdays(initialList)
     setCardSelectedDay(day)
     setCardModalOpen(true)
   }
+
+  // Restaurar sesión de admin si ya se autenticó previamente en la pestaña
+  useEffect(() => {
+    try {
+      const savedKey = sessionStorage.getItem('cumpleaz_admin_key')
+      if (savedKey) {
+        fetch('/api/admin/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ accessKey: savedKey }),
+        })
+          .then(res => {
+            if (res.ok) {
+              setPassword(savedKey)
+              setIsAdminLoggedIn(true)
+            } else {
+              sessionStorage.removeItem('cumpleaz_admin_key')
+            }
+          })
+          .catch(() => {})
+      }
+    } catch {}
+  }, [])
 
   // Close modal on Escape
   useEffect(() => {
@@ -204,17 +242,28 @@ export default function Page() {
 
   const openAdmin = () => {
     setAdminOpen(true)
-    setAdminView('login')
+    setAdminView(isAdminLoggedIn ? 'list' : 'login')
   }
 
   const closeAdmin = () => {
     setAdminOpen(false)
-    setAdminView('login')
-    setPassword('')
-    setLoginError(false)
+    if (!isAdminLoggedIn) {
+      setPassword('')
+      setLoginError(false)
+    }
     setSearch('')
     setNewName(''); setNewDay(''); setNewMonth(''); setNewYear('')
     setEditingBirthday(null)
+  }
+
+  const logoutAdmin = () => {
+    setIsAdminLoggedIn(false)
+    setPassword('')
+    try {
+      sessionStorage.removeItem('cumpleaz_admin_key')
+    } catch {}
+    setAdminView('login')
+    addToast('Sesión de administrador finalizada.')
   }
 
   const login = async () => {
@@ -228,7 +277,12 @@ export default function Page() {
       })
       if (res.ok) {
         setLoginError(false)
+        setIsAdminLoggedIn(true)
+        try {
+          sessionStorage.setItem('cumpleaz_admin_key', password)
+        } catch {}
         setAdminView('list')
+        addToast('Acceso autorizado como administrador.')
       } else {
         setLoginError(true)
       }
@@ -356,23 +410,50 @@ export default function Page() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Botón Tarjeta: solo lo activa el administrador */}
             <button
               id="btn-greeting-card"
-              onClick={() => openGreetingCard(todayBirthdays.length > 0 ? todayBirthdays : monthBirthdays.slice(0, 4))}
-              className="flex items-center gap-2 rounded-full border border-[#ded7cf] bg-[#fbf5ee] px-3 py-2 text-sm font-semibold text-[#78532f] transition-all hover:border-[#78532f] hover:bg-[#f6ebd9] active:scale-95 sm:px-4 shadow-xs"
-              title="Crear y descargar tarjeta de felicitación para redes sociales o WhatsApp"
+              disabled={!isAdminLoggedIn}
+              onClick={() => {
+                if (isAdminLoggedIn) {
+                  openGreetingCard(todayBirthdays)
+                }
+              }}
+              className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all sm:px-4 ${
+                isAdminLoggedIn
+                  ? 'border-[#78532f] bg-[#fbf5ee] text-[#78532f] hover:bg-[#f6ebd9] active:scale-95 shadow-xs cursor-pointer'
+                  : 'border-[#ded7cf] bg-[#f4f2ee] text-[#a39a92] cursor-not-allowed opacity-60'
+              }`}
+              title={
+                isAdminLoggedIn
+                  ? 'Crear y descargar tarjeta de felicitación oficial'
+                  : 'Desactivado: Solo el administrador puede activar la tarjeta con su clave de acceso'
+              }
             >
-              <Sparkles className="size-4 text-[#e87358]" />
-              <span className="hidden sm:inline">Tarjeta de Felicitación</span>
+              {isAdminLoggedIn ? (
+                <Sparkles className="size-4 text-[#e87358]" />
+              ) : (
+                <LockKeyhole className="size-3.5 text-[#a39a92]" />
+              )}
+              <span className="hidden sm:inline">
+                {isAdminLoggedIn ? 'Tarjeta de Felicitación' : 'Tarjeta (Solo Admin)'}
+              </span>
               <span className="sm:hidden">Tarjeta</span>
             </button>
+
             <button
               id="btn-admin"
               onClick={openAdmin}
-              className="flex items-center gap-2 rounded-full border border-[#ded7cf] px-3 py-2 text-sm font-medium text-[#6f665f] transition-all hover:border-[#e87358] hover:text-[#e87358] sm:px-4"
+              className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-all sm:px-4 ${
+                isAdminLoggedIn
+                  ? 'border-[#3f8f5b] bg-[#f0f9f3] text-[#2c6e43] hover:bg-[#e3f4e8]'
+                  : 'border-[#ded7cf] text-[#6f665f] hover:border-[#e87358] hover:text-[#e87358]'
+              }`}
             >
               <Settings2 className="size-4" />
-              <span className="hidden sm:inline">Administrar</span>
+              <span className="hidden sm:inline">
+                {isAdminLoggedIn ? 'Panel Admin' : 'Administrar'}
+              </span>
             </button>
           </div>
         </div>
@@ -380,8 +461,8 @@ export default function Page() {
 
       <div className="mx-auto max-w-5xl px-5 py-8 lg:px-8 lg:py-12">
 
-        {/* ── Cumpleañeros de hoy ── */}
-        {todayBirthdays.length > 0 && (
+        {/* ── Cumpleañeros de hoy (notificación si hay o no hay) ── */}
+        {todayBirthdays.length > 0 ? (
           <div className="animate-slide-in-up mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-[#f5d7c8] bg-gradient-to-r from-[#fef3ee] to-[#fde8df] px-5 py-4 shadow-sm">
             <div className="flex items-center gap-3">
               <span className="text-3xl">🎂</span>
@@ -394,14 +475,23 @@ export default function Page() {
                 </p>
               </div>
             </div>
-            <button
-              id="btn-today-card"
-              onClick={() => openGreetingCard(todayBirthdays)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e87358] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#c65b45] active:scale-[0.98] transition self-start sm:self-auto shrink-0"
-            >
-              <Sparkles className="size-4" />
-              Generar Tarjeta de Hoy
-            </button>
+            {isAdminLoggedIn && (
+              <button
+                id="btn-today-card"
+                onClick={() => openGreetingCard(todayBirthdays)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e87358] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#c65b45] active:scale-[0.98] transition self-start sm:self-auto shrink-0"
+              >
+                <Sparkles className="size-4" />
+                Generar Tarjeta de Hoy
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="mb-8 flex items-center gap-3 rounded-2xl border border-[#e9e3dc] bg-white px-5 py-3.5 shadow-xs text-sm text-[#6f665f]">
+            <span className="text-xl">📅</span>
+            <p>
+              Hoy, <strong className="text-[#17254e] font-semibold">{today.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}</strong>, no hay cumpleañeros registrados en la asociación.
+            </p>
           </div>
         )}
 
@@ -459,7 +549,7 @@ export default function Page() {
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
                 {MONTH_NAMES[visibleMonth]} {visibleYear}
               </p>
-              {monthBirthdays.length > 0 && (
+              {isAdminLoggedIn && monthBirthdays.length > 0 && (
                 <button
                   onClick={() => openGreetingCard(monthBirthdays)}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#78532f] hover:text-[#5b3a1a] transition hover:underline"
@@ -547,15 +637,25 @@ export default function Page() {
 
                         {entries.length > 0 && (
                           <div className="absolute right-1.5 top-8 sm:right-2 sm:top-9">
-                            <button
-                              type="button"
-                              onClick={() => openGreetingCard(entries, day)}
-                              title={`Crear tarjeta de felicitación para: ${entries.map(e => e.name).join(', ')}`}
-                              aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}. Clic para generar tarjeta.`}
-                              className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md transition hover:scale-115 active:scale-95 cursor-pointer"
-                            >
-                              {entries.length > 9 ? '9+' : entries.length}
-                            </button>
+                            {isAdminLoggedIn ? (
+                              <button
+                                type="button"
+                                onClick={() => openGreetingCard(entries, day)}
+                                title={`Crear tarjeta de felicitación para: ${entries.map(e => e.name).join(', ')}`}
+                                aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}. Clic para generar tarjeta.`}
+                                className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md transition hover:scale-115 active:scale-95 cursor-pointer"
+                              >
+                                {entries.length > 9 ? '9+' : entries.length}
+                              </button>
+                            ) : (
+                              <span
+                                title={entries.map(e => e.name).join(', ')}
+                                aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}`}
+                                className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md"
+                              >
+                                {entries.length > 9 ? '9+' : entries.length}
+                              </span>
+                            )}
                           </div>
                         )}
                       </>
@@ -602,13 +702,25 @@ export default function Page() {
                   {adminView === 'edit' && 'Editar registro'}
                 </h2>
               </div>
-              <button
-                aria-label="Cerrar panel"
-                onClick={closeAdmin}
-                className="rounded-full p-2 text-[#a39a92] hover:bg-[#f5eee8] hover:text-[#292523] transition"
-              >
-                <X className="size-5" />
-              </button>
+              <div className="flex items-center gap-1">
+                {isAdminLoggedIn && adminView === 'list' && (
+                  <button
+                    onClick={logoutAdmin}
+                    className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-medium text-[#b95b4b] hover:bg-[#fbe9e3] transition mr-2"
+                    title="Cerrar sesión de administrador"
+                  >
+                    <LogOut className="size-3.5" />
+                    Cerrar sesión
+                  </button>
+                )}
+                <button
+                  aria-label="Cerrar panel"
+                  onClick={closeAdmin}
+                  className="rounded-full p-2 text-[#a39a92] hover:bg-[#f5eee8] hover:text-[#292523] transition"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
             </div>
 
             {/* ── Vista: Login ── */}
