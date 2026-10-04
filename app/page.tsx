@@ -171,10 +171,12 @@ export default function Page() {
   const [cardModalOpen, setCardModalOpen] = useState(false)
   const [cardInitialBirthdays, setCardInitialBirthdays] = useState<Birthday[]>([])
   const [cardSelectedDay, setCardSelectedDay] = useState<number | null>(null)
+  const [pendingCardOpen, setPendingCardOpen] = useState<{ list: Birthday[]; day: number | null } | null>(null)
 
   const openGreetingCard = (initialList: Birthday[] = [], day: number | null = null) => {
     if (!isAdminLoggedIn) {
-      addToast('La tarjeta solo puede ser activada por el administrador con clave.', 'error')
+      setPendingCardOpen({ list: initialList, day })
+      addToast('Ingresa tu clave de administrador para activar la tarjeta.', 'success')
       setAdminOpen(true)
       setAdminView('login')
       return
@@ -304,6 +306,16 @@ export default function Page() {
         try {
           sessionStorage.setItem('cumpleaz_admin_key', trimmed)
         } catch {}
+        if (pendingCardOpen) {
+          const target = pendingCardOpen
+          setPendingCardOpen(null)
+          closeAdmin()
+          setCardInitialBirthdays(target.list)
+          setCardSelectedDay(target.day)
+          setCardModalOpen(true)
+          addToast('Acceso autorizado. Tarjeta activada.')
+          return
+        }
         setAdminView('list')
         addToast('Acceso autorizado como administrador.')
       } else {
@@ -725,16 +737,30 @@ export default function Page() {
                   {adminView === 'edit' && 'Editar registro'}
                 </h2>
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 {isAdminLoggedIn && adminView === 'list' && (
-                  <button
-                    onClick={logoutAdmin}
-                    className="flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-medium text-[#b95b4b] hover:bg-[#fbe9e3] transition mr-2"
-                    title="Cerrar sesión de administrador"
-                  >
-                    <LogOut className="size-3.5" />
-                    Cerrar sesión
-                  </button>
+                  <>
+                    <button
+                      id="btn-header-to-card"
+                      onClick={() => {
+                        closeAdmin()
+                        openGreetingCard(todayBirthdays.length > 0 ? todayBirthdays : monthBirthdays)
+                      }}
+                      className="flex items-center gap-1.5 rounded-xl border border-[#78532f] bg-[#fbf5ee] px-3 py-1.5 text-xs font-semibold text-[#78532f] hover:bg-[#f6ebd9] active:scale-95 transition"
+                      title="Ir directamente a generar tarjeta de felicitación"
+                    >
+                      <Sparkles className="size-3.5 text-[#e87358]" />
+                      <span>Generar Tarjeta</span>
+                    </button>
+                    <button
+                      onClick={logoutAdmin}
+                      className="flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs font-medium text-[#b95b4b] hover:bg-[#fbe9e3] transition"
+                      title="Cerrar sesión de administrador"
+                    >
+                      <LogOut className="size-3.5" />
+                      <span className="hidden sm:inline">Cerrar sesión</span>
+                    </button>
+                  </>
                 )}
                 <button
                   aria-label="Cerrar panel"
@@ -787,9 +813,9 @@ export default function Page() {
             {/* ── Vista: Lista de registros ── */}
             {adminView === 'list' && (
               <div className="flex flex-col overflow-hidden flex-1">
-                {/* Barra superior: buscar + agregar */}
-                <div className="flex gap-2 border-b border-[#e9e3dc] px-4 py-3 shrink-0">
-                  <div className="flex flex-1 items-center gap-2 rounded-xl border border-[#ded7cf] px-3">
+                {/* Barra superior: buscar + agregar + generar tarjeta */}
+                <div className="flex flex-wrap sm:flex-nowrap gap-2 border-b border-[#e9e3dc] px-4 py-3 shrink-0">
+                  <div className="flex flex-1 items-center gap-2 rounded-xl border border-[#ded7cf] px-3 min-w-[180px]">
                     <Search className="size-4 text-[#a39a92] shrink-0" />
                     <input
                       value={search}
@@ -806,10 +832,23 @@ export default function Page() {
                   <button
                     id="btn-add-birthday"
                     onClick={() => openAdd()}
-                    className="flex items-center gap-1.5 rounded-xl bg-[#e87358] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#c65b45] transition shrink-0"
+                    className="flex items-center gap-1.5 rounded-xl bg-[#e87358] px-3.5 py-2.5 text-sm font-semibold text-white hover:bg-[#c65b45] transition shrink-0 shadow-xs"
                   >
                     <Plus className="size-4" />
-                    <span className="hidden sm:inline">Agregar</span>
+                    <span>Agregar</span>
+                  </button>
+                  <button
+                    id="btn-toolbar-to-card"
+                    onClick={() => {
+                      closeAdmin()
+                      openGreetingCard(todayBirthdays.length > 0 ? todayBirthdays : monthBirthdays)
+                    }}
+                    className="flex items-center gap-1.5 rounded-xl border border-[#78532f] bg-[#fbf5ee] px-3.5 py-2.5 text-sm font-semibold text-[#78532f] hover:bg-[#f6ebd9] transition shrink-0 shadow-xs"
+                    title="Ir a crear la tarjeta de felicitación"
+                  >
+                    <Sparkles className="size-4 text-[#e87358]" />
+                    <span className="hidden sm:inline">Generar Tarjeta</span>
+                    <span className="sm:hidden">Tarjeta</span>
                   </button>
                 </div>
 
