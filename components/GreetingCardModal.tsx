@@ -259,18 +259,24 @@ export default function GreetingCardModal({
   // Días únicos con cumpleañeros en el mes
   const daysWithBirthdays = useMemo(() => {
     const map = new Map<number, BirthdayItem[]>()
-    allMonthBirthdays.forEach(b => {
-      const parts = b.date.split('-')
+    ;(allMonthBirthdays || []).forEach(b => {
+      if (!b?.date) return
+      const clean = b.date.includes('T') ? b.date.split('T')[0] : b.date
+      const parts = clean.split('-')
       const day = parseInt(parts[2], 10)
-      if (!map.has(day)) map.set(day, [])
-      map.get(day)!.push(b)
+      if (day && !isNaN(day)) {
+        if (!map.has(day)) map.set(day, [])
+        map.get(day)!.push(b)
+      }
     })
     return Array.from(map.entries()).sort((a, b) => a[0] - b[0])
   }, [allMonthBirthdays])
 
   const selectSpecificDay = (dayNum: number) => {
-    const list = allMonthBirthdays.filter(b => {
-      const parts = b.date.split('-')
+    const list = (allMonthBirthdays || []).filter(b => {
+      if (!b?.date) return false
+      const clean = b.date.includes('T') ? b.date.split('T')[0] : b.date
+      const parts = clean.split('-')
       return parseInt(parts[2], 10) === dayNum
     })
     setNamesText(formatNames(list))
@@ -279,8 +285,10 @@ export default function GreetingCardModal({
   const loadPreset = (type: 'today' | 'day' | 'month') => {
     if (type === 'today') {
       const today = new Date()
-      const todayList = allMonthBirthdays.filter(b => {
-        const parts = b.date.split('-')
+      const todayList = (allMonthBirthdays || []).filter(b => {
+        if (!b?.date) return false
+        const clean = b.date.includes('T') ? b.date.split('T')[0] : b.date
+        const parts = clean.split('-')
         const m = parseInt(parts[1], 10) - 1
         const d = parseInt(parts[2], 10)
         return m === today.getMonth() && d === today.getDate()

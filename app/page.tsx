@@ -35,7 +35,15 @@ const WEEK_DAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const fetcher = (url: string) => fetch(url).then(r => r.json())
+const fetcher = async (url: string) => {
+  const res = await fetch(url)
+  if (!res.ok) {
+    const errData = await res.json().catch(() => null)
+    throw new Error(errData?.error || `Error ${res.status}`)
+  }
+  const data = await res.json()
+  return Array.isArray(data) ? data : []
+}
 
 function getCalendarDays(year: number, month: number): (number | null)[] {
   const first = new Date(year, month, 1)
@@ -50,12 +58,25 @@ function getCalendarDays(year: number, month: number): (number | null)[] {
   )
 }
 
-function parseDate(dateStr: string) {
-  return new Date(`${dateStr}T12:00:00`)
+function parseDate(dateStr: string): Date {
+  if (!dateStr || typeof dateStr !== 'string') return new Date(2000, 0, 1)
+  const clean = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+  const parts = clean.split('-')
+  if (parts.length >= 3) {
+    const y = parseInt(parts[0], 10) || 2000
+    const m = (parseInt(parts[1], 10) || 1) - 1
+    const d = parseInt(parts[2], 10) || 1
+    return new Date(y, m, d, 12, 0, 0)
+  }
+  const parsed = new Date(dateStr)
+  return isNaN(parsed.getTime()) ? new Date(2000, 0, 1) : parsed
 }
 
 function formatDisplayDate(dateStr: string): string {
-  return parseDate(dateStr).toLocaleDateString('es-ES', {
+  if (!dateStr) return 'Fecha no disponible'
+  const d = parseDate(dateStr)
+  if (isNaN(d.getTime())) return dateStr
+  return d.toLocaleDateString('es-ES', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -63,11 +84,12 @@ function formatDisplayDate(dateStr: string): string {
 }
 
 function isTodayBirthday(dateStr: string, today: Date): boolean {
-  if (!dateStr) return false
-  const parts = dateStr.split('-')
-  if (parts.length === 3) {
-    const m = parseInt(parts[1], 10) - 1
-    const d = parseInt(parts[2], 10)
+  if (!dateStr || typeof dateStr !== 'string') return false
+  const clean = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr
+  const parts = clean.split('-')
+  if (parts.length >= 3) {
+    const m = (parseInt(parts[1], 10) || 1) - 1
+    const d = parseInt(parts[2], 10) || 0
     return d === today.getDate() && m === today.getMonth()
   }
   const d = parseDate(dateStr)
@@ -104,8 +126,8 @@ export default function Page() {
   const [visibleYear, setVisibleYear] = useState(today.getFullYear())
 
   // Data
-  const { data: storedBirthdays, mutate } = useSWR<Birthday[]>('/api/birthdays', fetcher)
-  const birthdays = useMemo(() => storedBirthdays ?? [], [storedBirthdays])
+  const { data: storedBirthdays, mutate, error: birthdaysError } = useSWR<Birthday[]>('/api/birthdays', fetcher)
+  const birthdays = useMemo(() => (Array.isArray(storedBirthdays) ? storedBirthdays : []), [storedBirthdays])
 
   // Admin state
   const [adminOpen, setAdminOpen] = useState(false)
@@ -267,19 +289,20 @@ export default function Page() {
   }
 
   const login = async () => {
-    if (!password.trim()) return
+    const trimmed = password.trim()
+    if (!trimmed) return
     setLoginLoading(true)
     try {
       const res = await fetch('/api/admin/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ accessKey: password }),
+        body: JSON.stringify({ accessKey: trimmed }),
       })
       if (res.ok) {
         setLoginError(false)
         setIsAdminLoggedIn(true)
         try {
-          sessionStorage.setItem('cumpleaz_admin_key', password)
+          sessionStorage.setItem('cumpleaz_admin_key', trimmed)
         } catch {}
         setAdminView('list')
         addToast('Acceso autorizado como administrador.')
@@ -792,6 +815,11 @@ export default function Page() {
 
                 {/* Lista */}
                 <div className="overflow-y-auto flex-1 px-4 py-3">
+                  {birthdaysError && (
+                    <div className="mb-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                      ⚠️ No se pudo conectar a la base de datos de PostgreSQL. Si estás en Vercel, verifica que la variable <strong>DATABASE_URL</strong> esté configurada en el panel de Vercel.
+                    </div>
+                  )}
                   {filteredBirthdays.length === 0 ? (
                     <div className="flex flex-col items-center gap-3 py-10 text-center text-sm text-[#a39a92]">
                       <Calendar className="size-8 opacity-40" />
