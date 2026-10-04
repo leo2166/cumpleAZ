@@ -510,16 +510,6 @@ export default function Page() {
                 </p>
               </div>
             </div>
-            {isAdminLoggedIn && (
-              <button
-                id="btn-today-card"
-                onClick={() => openGreetingCard(todayBirthdays)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e87358] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#c65b45] active:scale-[0.98] transition self-start sm:self-auto shrink-0"
-              >
-                <Sparkles className="size-4" />
-                Generar Tarjeta de Hoy
-              </button>
-            )}
           </div>
         ) : (
           <div className="mb-8 flex items-center gap-3 rounded-2xl border border-[#e9e3dc] bg-white px-5 py-3.5 shadow-xs text-sm text-[#6f665f]">
@@ -584,15 +574,6 @@ export default function Page() {
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
                 {MONTH_NAMES[visibleMonth]} {visibleYear}
               </p>
-              {isAdminLoggedIn && monthBirthdays.length > 0 && (
-                <button
-                  onClick={() => openGreetingCard(monthBirthdays)}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#78532f] hover:text-[#5b3a1a] transition hover:underline"
-                >
-                  <Sparkles className="size-3.5 text-[#e87358]" />
-                  Crear tarjeta con este mes
-                </button>
-              )}
             </div>
             {monthBirthdays.length > 0 ? (
               <ul className="flex flex-wrap justify-center gap-x-6 gap-y-1.5">
@@ -672,25 +653,13 @@ export default function Page() {
 
                         {entries.length > 0 && (
                           <div className="absolute right-1.5 top-8 sm:right-2 sm:top-9">
-                            {isAdminLoggedIn ? (
-                              <button
-                                type="button"
-                                onClick={() => openGreetingCard(entries, day)}
-                                title={`Crear tarjeta de felicitación para: ${entries.map(e => e.name).join(', ')}`}
-                                aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}. Clic para generar tarjeta.`}
-                                className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md transition hover:scale-115 active:scale-95 cursor-pointer"
-                              >
-                                {entries.length > 9 ? '9+' : entries.length}
-                              </button>
-                            ) : (
-                              <span
-                                title={entries.map(e => e.name).join(', ')}
-                                aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}`}
-                                className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md"
-                              >
-                                {entries.length > 9 ? '9+' : entries.length}
-                              </span>
-                            )}
+                            <span
+                              title={entries.map(e => e.name).join(', ')}
+                              aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}`}
+                              className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md"
+                            >
+                              {entries.length > 9 ? '9+' : entries.length}
+                            </span>
                           </div>
                         )}
                       </>
@@ -836,19 +805,6 @@ export default function Page() {
                   >
                     <Plus className="size-4" />
                     <span>Agregar</span>
-                  </button>
-                  <button
-                    id="btn-toolbar-to-card"
-                    onClick={() => {
-                      closeAdmin()
-                      openGreetingCard(todayBirthdays.length > 0 ? todayBirthdays : monthBirthdays)
-                    }}
-                    className="flex items-center gap-1.5 rounded-xl border border-[#78532f] bg-[#fbf5ee] px-3.5 py-2.5 text-sm font-semibold text-[#78532f] hover:bg-[#f6ebd9] transition shrink-0 shadow-xs"
-                    title="Ir a crear la tarjeta de felicitación"
-                  >
-                    <Sparkles className="size-4 text-[#e87358]" />
-                    <span className="hidden sm:inline">Generar Tarjeta</span>
-                    <span className="sm:hidden">Tarjeta</span>
                   </button>
                 </div>
 
