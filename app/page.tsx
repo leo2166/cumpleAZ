@@ -107,13 +107,17 @@ export default function Page() {
 
   // Add form
   const [newName, setNewName] = useState('')
-  const [newDate, setNewDate] = useState('')
+  const [newDay, setNewDay] = useState('')
+  const [newMonth, setNewMonth] = useState('')
+  const [newYear, setNewYear] = useState('')
   const [addLoading, setAddLoading] = useState(false)
 
   // Edit form
   const [editingBirthday, setEditingBirthday] = useState<Birthday | null>(null)
   const [editName, setEditName] = useState('')
-  const [editDate, setEditDate] = useState('')
+  const [editDay, setEditDay] = useState('')
+  const [editMonth, setEditMonth] = useState('')
+  const [editYear, setEditYear] = useState('')
   const [editLoading, setEditLoading] = useState(false)
 
   // Toasts
@@ -196,8 +200,7 @@ export default function Page() {
     setPassword('')
     setLoginError(false)
     setSearch('')
-    setNewName('')
-    setNewDate('')
+    setNewName(''); setNewDay(''); setNewMonth(''); setNewYear('')
     setEditingBirthday(null)
   }
 
@@ -223,27 +226,35 @@ export default function Page() {
     }
   }
 
+  // Helper: construye YYYY-MM-DD desde partes
+  const buildDate = (d: string, m: string, y: string): string => {
+    if (!d || !m || !y) return ''
+    const dd = d.padStart(2, '0')
+    const mm = m.padStart(2, '0')
+    return `${y}-${mm}-${dd}`
+  }
+
   const openAdd = (initialName?: string) => {
     const nameToUse = (typeof initialName === 'string' ? initialName : search).trim()
     setNewName(nameToUse)
-    setNewDate('')
+    setNewDay(''); setNewMonth(''); setNewYear('')
     setAdminView('add')
   }
 
   const addBirthday = async () => {
-    if (!newName.trim() || !newDate) return
+    const dateStr = buildDate(newDay, newMonth, newYear)
+    if (!newName.trim() || !dateStr) return
     const nameToAdd = newName.trim()
     setAddLoading(true)
     try {
       const res = await fetch('/api/birthdays', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-key': password },
-        body: JSON.stringify({ name: nameToAdd, date: newDate }),
+        body: JSON.stringify({ name: nameToAdd, date: dateStr }),
       })
       if (!res.ok) { addToast('No se pudo agregar el registro.', 'error'); return }
       await mutate()
-      setNewName('')
-      setNewDate('')
+      setNewName(''); setNewDay(''); setNewMonth(''); setNewYear('')
       setSearch('')
       addToast(`${nameToAdd} agregado correctamente.`)
       setAdminView('list')
@@ -257,18 +268,23 @@ export default function Page() {
   const startEditing = (birthday: Birthday) => {
     setEditingBirthday(birthday)
     setEditName(birthday.name)
-    setEditDate(birthday.date)
+    // Parsear fecha guardada YYYY-MM-DD
+    const parts = birthday.date.split('-')
+    setEditYear(parts[0] ?? '')
+    setEditMonth(parts[1] ? String(parseInt(parts[1])) : '')
+    setEditDay(parts[2] ? String(parseInt(parts[2])) : '')
     setAdminView('edit')
   }
 
   const saveEdit = async () => {
-    if (!editingBirthday || !editName.trim() || !editDate) return
+    const dateStr = buildDate(editDay, editMonth, editYear)
+    if (!editingBirthday || !editName.trim() || !dateStr) return
     setEditLoading(true)
     try {
       const res = await fetch('/api/birthdays', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'x-admin-key': password },
-        body: JSON.stringify({ id: editingBirthday.id, name: editName.trim(), date: editDate }),
+        body: JSON.stringify({ id: editingBirthday.id, name: editName.trim(), date: dateStr }),
       })
       if (!res.ok) { addToast('No se pudo guardar los cambios.', 'error'); return }
       await mutate()
@@ -693,17 +709,50 @@ export default function Page() {
                       autoFocus={!newName.trim()}
                     />
                   </label>
-                  <label className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-[#292523]">Fecha de cumpleaños</span>
-                    <input
-                      id="new-birthday-date"
-                      type="date"
-                      value={newDate}
-                      onChange={e => setNewDate(e.target.value)}
-                      className="rounded-xl border border-[#ded7cf] px-4 py-3 text-sm outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
-                      autoFocus={Boolean(newName.trim())}
-                    />
-                  </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="new-day" className="text-[10px] text-[#a39a92] font-medium">Día</label>
+                        <input
+                          id="new-day"
+                          inputMode="numeric"
+                          maxLength={2}
+                          value={newDay}
+                          onChange={e => setNewDay(e.target.value.replace(/\D/g, '').slice(0,2))}
+                          placeholder="DD"
+                          className="rounded-xl border border-[#ded7cf] px-3 py-3 text-sm text-center outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
+                          autoFocus={Boolean(newName.trim())}
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="new-month" className="text-[10px] text-[#a39a92] font-medium">Mes</label>
+                        <select
+                          id="new-month"
+                          value={newMonth}
+                          onChange={e => setNewMonth(e.target.value)}
+                          className="rounded-xl border border-[#ded7cf] px-2 py-3 text-sm outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition bg-white"
+                        >
+                          <option value="">Mes</option>
+                          {MONTH_NAMES.map((m, i) => (
+                            <option key={i} value={String(i + 1)}>{m}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="new-year" className="text-[10px] text-[#a39a92] font-medium">Año</label>
+                        <input
+                          id="new-year"
+                          inputMode="numeric"
+                          maxLength={4}
+                          value={newYear}
+                          onChange={e => setNewYear(e.target.value.replace(/\D/g, '').slice(0,4))}
+                          placeholder="AAAA"
+                          className="rounded-xl border border-[#ded7cf] px-3 py-3 text-sm text-center outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex gap-2 justify-end">
                   <button
@@ -715,7 +764,7 @@ export default function Page() {
                   <button
                     id="btn-save-new-birthday"
                     onClick={addBirthday}
-                    disabled={addLoading || !newName.trim() || !newDate}
+                    disabled={addLoading || !newName.trim() || !buildDate(newDay, newMonth, newYear)}
                     className="flex items-center gap-2 rounded-xl bg-[#e87358] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#c65b45] disabled:opacity-50 transition"
                   >
                     {addLoading ? 'Guardando…' : <><Plus className="size-4" /> Agregar</>}
@@ -739,16 +788,49 @@ export default function Page() {
                       autoFocus
                     />
                   </label>
-                  <label className="flex flex-col gap-1.5">
+                  <div className="flex flex-col gap-1.5">
                     <span className="text-xs font-semibold text-[#292523]">Fecha de cumpleaños</span>
-                    <input
-                      id="edit-birthday-date"
-                      type="date"
-                      value={editDate}
-                      onChange={e => setEditDate(e.target.value)}
-                      className="rounded-xl border border-[#ded7cf] px-4 py-3 text-sm outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
-                    />
-                  </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="edit-day" className="text-[10px] text-[#a39a92] font-medium">Día</label>
+                        <input
+                          id="edit-day"
+                          inputMode="numeric"
+                          maxLength={2}
+                          value={editDay}
+                          onChange={e => setEditDay(e.target.value.replace(/\D/g, '').slice(0,2))}
+                          placeholder="DD"
+                          className="rounded-xl border border-[#ded7cf] px-3 py-3 text-sm text-center outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="edit-month" className="text-[10px] text-[#a39a92] font-medium">Mes</label>
+                        <select
+                          id="edit-month"
+                          value={editMonth}
+                          onChange={e => setEditMonth(e.target.value)}
+                          className="rounded-xl border border-[#ded7cf] px-2 py-3 text-sm outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition bg-white"
+                        >
+                          <option value="">Mes</option>
+                          {MONTH_NAMES.map((m, i) => (
+                            <option key={i} value={String(i + 1)}>{m}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label htmlFor="edit-year" className="text-[10px] text-[#a39a92] font-medium">Año</label>
+                        <input
+                          id="edit-year"
+                          inputMode="numeric"
+                          maxLength={4}
+                          value={editYear}
+                          onChange={e => setEditYear(e.target.value.replace(/\D/g, '').slice(0,4))}
+                          placeholder="AAAA"
+                          className="rounded-xl border border-[#ded7cf] px-3 py-3 text-sm text-center outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div className="flex gap-2 justify-between">
                   <button
@@ -768,7 +850,7 @@ export default function Page() {
                     <button
                       id="btn-save-edit-birthday"
                       onClick={saveEdit}
-                      disabled={editLoading || !editName.trim() || !editDate}
+                      disabled={editLoading || !editName.trim() || !buildDate(editDay, editMonth, editYear)}
                       className="rounded-xl bg-[#263b78] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#17254e] disabled:opacity-50 transition"
                     >
                       {editLoading ? 'Guardando…' : 'Guardar cambios'}
