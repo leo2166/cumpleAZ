@@ -150,9 +150,9 @@ export default function Page() {
   const monthBirthdays = useMemo(
     () => birthdays.filter(b => {
       const d = parseDate(b.date)
-      return d.getMonth() === visibleMonth && d.getFullYear() === visibleYear
+      return d.getMonth() === visibleMonth
     }),
-    [birthdays, visibleMonth, visibleYear]
+    [birthdays, visibleMonth]
   )
 
   const todayBirthdays = useMemo(
