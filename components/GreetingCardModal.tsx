@@ -280,7 +280,7 @@ export default function GreetingCardModal({
     setNamesText(formatNames(list))
   }
 
-  const loadPreset = (type: 'today' | 'day' | 'month') => {
+  const loadPreset = (type: 'today' | 'day') => {
     if (type === 'today') {
       const today = new Date()
       const todayList = (allMonthBirthdays || []).filter(b => {
@@ -298,8 +298,6 @@ export default function GreetingCardModal({
       }
     } else if (type === 'day' && selectedDay !== null) {
       selectSpecificDay(selectedDay)
-    } else if (type === 'month') {
-      setNamesText(formatNames(allMonthBirthdays))
     }
   }
 
@@ -426,15 +424,6 @@ export default function GreetingCardModal({
                       </option>
                     ))}
                   </select>
-                )}
-
-                {allMonthBirthdays.length > 0 && (
-                  <button
-                    onClick={() => loadPreset('month')}
-                    className="rounded-lg bg-[#f4f2ee] px-2.5 py-1 text-xs font-medium text-[#4a403a] hover:bg-[#e9e4dc] transition"
-                  >
-                    Todo el mes ({allMonthBirthdays.length})
-                  </button>
                 )}
               </div>
             </div>

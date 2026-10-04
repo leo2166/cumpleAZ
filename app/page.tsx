@@ -713,7 +713,7 @@ export default function Page() {
                       id="btn-header-to-card"
                       onClick={() => {
                         closeAdmin()
-                        openGreetingCard(todayBirthdays.length > 0 ? todayBirthdays : monthBirthdays)
+                        openGreetingCard(todayBirthdays)
                       }}
                       className="flex items-center gap-1.5 rounded-xl border border-[#78532f] bg-[#fbf5ee] px-3 py-1.5 text-xs font-semibold text-[#78532f] hover:bg-[#f6ebd9] active:scale-95 transition"
                       title="Ir directamente a generar tarjeta de felicitación"
