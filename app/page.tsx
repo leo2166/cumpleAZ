@@ -584,7 +584,7 @@ export default function Page() {
             </div>
             {monthBirthdays.length > 0 ? (
               <ul className="flex flex-wrap justify-center gap-x-6 gap-y-1.5">
-                {monthBirthdays
+                {[...monthBirthdays]
                   .sort((a, b) => parseDate(a.date).getDate() - parseDate(b.date).getDate())
                   .map(b => {
                     const d = parseDate(b.date)

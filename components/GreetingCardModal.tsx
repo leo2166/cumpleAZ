@@ -192,7 +192,21 @@ export default function GreetingCardModal({
     return () => window.removeEventListener('keydown', onKey)
   }, [isOpen, onClose])
 
-  if (!isOpen) return null
+  // Días únicos con cumpleañeros en el mes (hook incondicional en el nivel superior)
+  const daysWithBirthdays = useMemo(() => {
+    const map = new Map<number, BirthdayItem[]>()
+    ;(allMonthBirthdays || []).forEach(b => {
+      if (!b?.date) return
+      const clean = b.date.includes('T') ? b.date.split('T')[0] : b.date
+      const parts = clean.split('-')
+      const day = parseInt(parts[2], 10)
+      if (day && !isNaN(day)) {
+        if (!map.has(day)) map.set(day, [])
+        map.get(day)!.push(b)
+      }
+    })
+    return Array.from(map.entries()).sort((a, b) => a[0] - b[0])
+  }, [allMonthBirthdays])
 
   // Acciones de descarga y compartir
   const handleDownload = () => {
@@ -256,22 +270,6 @@ export default function GreetingCardModal({
     }, 'image/png')
   }
 
-  // Días únicos con cumpleañeros en el mes
-  const daysWithBirthdays = useMemo(() => {
-    const map = new Map<number, BirthdayItem[]>()
-    ;(allMonthBirthdays || []).forEach(b => {
-      if (!b?.date) return
-      const clean = b.date.includes('T') ? b.date.split('T')[0] : b.date
-      const parts = clean.split('-')
-      const day = parseInt(parts[2], 10)
-      if (day && !isNaN(day)) {
-        if (!map.has(day)) map.set(day, [])
-        map.get(day)!.push(b)
-      }
-    })
-    return Array.from(map.entries()).sort((a, b) => a[0] - b[0])
-  }, [allMonthBirthdays])
-
   const selectSpecificDay = (dayNum: number) => {
     const list = (allMonthBirthdays || []).filter(b => {
       if (!b?.date) return false
@@ -304,6 +302,8 @@ export default function GreetingCardModal({
       setNamesText(formatNames(allMonthBirthdays))
     }
   }
+
+  if (!isOpen) return null
 
   return (
     <div
