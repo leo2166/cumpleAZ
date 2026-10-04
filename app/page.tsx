@@ -14,7 +14,9 @@ import {
   Sparkles,
   Trash2,
   X,
+  Share2,
 } from 'lucide-react'
+import GreetingCardModal from '@/components/GreetingCardModal'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -133,6 +135,17 @@ export default function Page() {
   const dismissToast = useCallback((id: number) => {
     setToasts(prev => prev.filter(t => t.id !== id))
   }, [])
+
+  // Greeting card modal state
+  const [cardModalOpen, setCardModalOpen] = useState(false)
+  const [cardInitialBirthdays, setCardInitialBirthdays] = useState<Birthday[]>([])
+  const [cardSelectedDay, setCardSelectedDay] = useState<number | null>(null)
+
+  const openGreetingCard = (initialList: Birthday[] = [], day: number | null = null) => {
+    setCardInitialBirthdays(initialList)
+    setCardSelectedDay(day)
+    setCardModalOpen(true)
+  }
 
   // Close modal on Escape
   useEffect(() => {
@@ -342,14 +355,26 @@ export default function Page() {
               </p>
             </div>
           </div>
-          <button
-            id="btn-admin"
-            onClick={openAdmin}
-            className="flex items-center gap-2 rounded-full border border-[#ded7cf] px-3 py-2 text-sm font-medium text-[#6f665f] transition-all hover:border-[#e87358] hover:text-[#e87358] sm:px-4"
-          >
-            <Settings2 className="size-4" />
-            <span className="hidden sm:inline">Administrar</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              id="btn-greeting-card"
+              onClick={() => openGreetingCard(todayBirthdays.length > 0 ? todayBirthdays : monthBirthdays.slice(0, 4))}
+              className="flex items-center gap-2 rounded-full border border-[#ded7cf] bg-[#fbf5ee] px-3 py-2 text-sm font-semibold text-[#78532f] transition-all hover:border-[#78532f] hover:bg-[#f6ebd9] active:scale-95 sm:px-4 shadow-xs"
+              title="Crear y descargar tarjeta de felicitación para redes sociales o WhatsApp"
+            >
+              <Sparkles className="size-4 text-[#e87358]" />
+              <span className="hidden sm:inline">Tarjeta de Felicitación</span>
+              <span className="sm:hidden">Tarjeta</span>
+            </button>
+            <button
+              id="btn-admin"
+              onClick={openAdmin}
+              className="flex items-center gap-2 rounded-full border border-[#ded7cf] px-3 py-2 text-sm font-medium text-[#6f665f] transition-all hover:border-[#e87358] hover:text-[#e87358] sm:px-4"
+            >
+              <Settings2 className="size-4" />
+              <span className="hidden sm:inline">Administrar</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -357,9 +382,9 @@ export default function Page() {
 
         {/* ── Cumpleañeros de hoy ── */}
         {todayBirthdays.length > 0 && (
-          <div className="animate-slide-in-up mb-8 rounded-2xl border border-[#f5d7c8] bg-gradient-to-r from-[#fef3ee] to-[#fde8df] px-5 py-4 shadow-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-2xl">🎂</span>
+          <div className="animate-slide-in-up mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-[#f5d7c8] bg-gradient-to-r from-[#fef3ee] to-[#fde8df] px-5 py-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🎂</span>
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-[#c65b45]">
                   ¡Hoy es el cumpleaños de!
@@ -369,6 +394,14 @@ export default function Page() {
                 </p>
               </div>
             </div>
+            <button
+              id="btn-today-card"
+              onClick={() => openGreetingCard(todayBirthdays)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#e87358] px-4 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-[#c65b45] active:scale-[0.98] transition self-start sm:self-auto shrink-0"
+            >
+              <Sparkles className="size-4" />
+              Generar Tarjeta de Hoy
+            </button>
           </div>
         )}
 
@@ -422,9 +455,20 @@ export default function Page() {
         {/* ── Lista de cumpleañeros del mes ── */}
         <section className="mx-auto mb-6 max-w-3xl">
           <div className="rounded-2xl border border-[#d9dce8] bg-[#f4f6fb] px-5 py-5 shadow-sm">
-            <p className="mb-3 text-center text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
-              {MONTH_NAMES[visibleMonth]} {visibleYear}
-            </p>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
+                {MONTH_NAMES[visibleMonth]} {visibleYear}
+              </p>
+              {monthBirthdays.length > 0 && (
+                <button
+                  onClick={() => openGreetingCard(monthBirthdays)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#78532f] hover:text-[#5b3a1a] transition hover:underline"
+                >
+                  <Sparkles className="size-3.5 text-[#e87358]" />
+                  Crear tarjeta con este mes
+                </button>
+              )}
+            </div>
             {monthBirthdays.length > 0 ? (
               <ul className="flex flex-wrap justify-center gap-x-6 gap-y-1.5">
                 {monthBirthdays
@@ -503,13 +547,15 @@ export default function Page() {
 
                         {entries.length > 0 && (
                           <div className="absolute right-1.5 top-8 sm:right-2 sm:top-9">
-                            <span
-                              title={entries.map(e => e.name).join(', ')}
-                              aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}`}
-                              className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md transition hover:scale-110"
+                            <button
+                              type="button"
+                              onClick={() => openGreetingCard(entries, day)}
+                              title={`Crear tarjeta de felicitación para: ${entries.map(e => e.name).join(', ')}`}
+                              aria-label={`${entries.length} ${entries.length === 1 ? 'cumpleañero' : 'cumpleañeros'}: ${entries.map(e => e.name).join(', ')}. Clic para generar tarjeta.`}
+                              className="flex size-8 items-center justify-center rounded-full border-2 border-white bg-[#3f8f5b] text-xs font-bold text-white shadow-md transition hover:scale-115 active:scale-95 cursor-pointer"
                             >
                               {entries.length > 9 ? '9+' : entries.length}
-                            </span>
+                            </button>
                           </div>
                         )}
                       </>
@@ -863,6 +909,17 @@ export default function Page() {
           </div>
         </div>
       )}
+
+      {/* ── Modal de Tarjeta de Felicitación ── */}
+      <GreetingCardModal
+        isOpen={cardModalOpen}
+        onClose={() => setCardModalOpen(false)}
+        initialBirthdays={cardInitialBirthdays}
+        allMonthBirthdays={monthBirthdays}
+        currentMonthName={MONTH_NAMES[visibleMonth]}
+        currentYear={visibleYear}
+        selectedDay={cardSelectedDay}
+      />
 
       {/* ── Toasts ── */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
