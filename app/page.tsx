@@ -223,20 +223,29 @@ export default function Page() {
     }
   }
 
+  const openAdd = (initialName?: string) => {
+    const nameToUse = (typeof initialName === 'string' ? initialName : search).trim()
+    setNewName(nameToUse)
+    setNewDate('')
+    setAdminView('add')
+  }
+
   const addBirthday = async () => {
     if (!newName.trim() || !newDate) return
+    const nameToAdd = newName.trim()
     setAddLoading(true)
     try {
       const res = await fetch('/api/birthdays', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-key': password },
-        body: JSON.stringify({ name: newName.trim(), date: newDate }),
+        body: JSON.stringify({ name: nameToAdd, date: newDate }),
       })
       if (!res.ok) { addToast('No se pudo agregar el registro.', 'error'); return }
       await mutate()
       setNewName('')
       setNewDate('')
-      addToast(`${newName.trim()} agregado correctamente.`)
+      setSearch('')
+      addToast(`${nameToAdd} agregado correctamente.`)
       setAdminView('list')
     } catch {
       addToast('Error de conexión.', 'error')
@@ -599,7 +608,7 @@ export default function Page() {
                   </div>
                   <button
                     id="btn-add-birthday"
-                    onClick={() => setAdminView('add')}
+                    onClick={() => openAdd()}
                     className="flex items-center gap-1.5 rounded-xl bg-[#e87358] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#c65b45] transition shrink-0"
                   >
                     <Plus className="size-4" />
@@ -610,11 +619,22 @@ export default function Page() {
                 {/* Lista */}
                 <div className="overflow-y-auto flex-1 px-4 py-3">
                   {filteredBirthdays.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-10 text-center text-sm text-[#a39a92]">
+                    <div className="flex flex-col items-center gap-3 py-10 text-center text-sm text-[#a39a92]">
                       <Calendar className="size-8 opacity-40" />
-                      {search
-                        ? `No se encontró "${search}".`
-                        : 'No hay registros aún. ¡Agrega el primero!'}
+                      {search ? (
+                        <>
+                          <p>No se encontró &ldquo;{search}&rdquo;.</p>
+                          <button
+                            onClick={() => openAdd(search)}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-[#e87358] px-4 py-2 text-xs font-semibold text-white hover:bg-[#c65b45] transition shadow-sm"
+                          >
+                            <Plus className="size-3.5" />
+                            Agregar &ldquo;{search.trim()}&rdquo;
+                          </button>
+                        </>
+                      ) : (
+                        <p>No hay registros aún. ¡Agrega el primero!</p>
+                      )}
                     </div>
                   ) : (
                     <ul className="flex flex-col gap-1.5">
@@ -670,7 +690,7 @@ export default function Page() {
                       onChange={e => setNewName(e.target.value)}
                       placeholder="Ej: María González"
                       className="rounded-xl border border-[#ded7cf] px-4 py-3 text-sm outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
-                      autoFocus
+                      autoFocus={!newName.trim()}
                     />
                   </label>
                   <label className="flex flex-col gap-1.5">
@@ -681,6 +701,7 @@ export default function Page() {
                       value={newDate}
                       onChange={e => setNewDate(e.target.value)}
                       className="rounded-xl border border-[#ded7cf] px-4 py-3 text-sm outline-none focus:border-[#e87358] focus:ring-2 focus:ring-[#e87358]/20 transition"
+                      autoFocus={Boolean(newName.trim())}
                     />
                   </label>
                 </div>
