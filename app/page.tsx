@@ -10,6 +10,7 @@ import {
   LockKeyhole,
   Pencil,
   Plus,
+  Printer,
   Search,
   Settings2,
   Sparkles,
@@ -19,6 +20,7 @@ import {
   LogOut,
 } from 'lucide-react'
 import GreetingCardModal from '@/components/GreetingCardModal'
+import MonthlyFlyerModal from '@/components/MonthlyFlyerModal'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -173,6 +175,9 @@ export default function Page() {
   const [cardInitialBirthdays, setCardInitialBirthdays] = useState<Birthday[]>([])
   const [cardSelectedDay, setCardSelectedDay] = useState<number | null>(null)
   const [pendingCardOpen, setPendingCardOpen] = useState<{ list: Birthday[]; day: number | null } | null>(null)
+
+  // Monthly flyer modal state (disponible para imprimir/descargar el reporte del mes)
+  const [flyerModalOpen, setFlyerModalOpen] = useState(false)
 
   const openGreetingCard = (initialList: Birthday[] = [], day: number | null = null) => {
     if (!isAdminLoggedIn) {
@@ -443,6 +448,18 @@ export default function Page() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {/* Botón Flyer del mes */}
+            <button
+              id="btn-monthly-flyer"
+              onClick={() => setFlyerModalOpen(true)}
+              className="flex items-center gap-2 rounded-full border border-[#cbd2e5] bg-white px-3 py-2 text-sm font-medium text-[#17254e] hover:border-[#17254e] hover:bg-[#edf0f8] active:scale-95 shadow-xs transition-all sm:px-4 cursor-pointer"
+              title={`Imprimir y descargar flyer oficial de los cumpleañeros de ${MONTH_NAMES[visibleMonth]}`}
+            >
+              <Printer className="size-4 text-[#e87358]" />
+              <span className="hidden sm:inline">Flyer del Mes</span>
+              <span className="sm:hidden">Flyer</span>
+            </button>
+
             {/* Botón Tarjeta: solo lo activa el administrador */}
             <button
               id="btn-greeting-card"
@@ -572,6 +589,15 @@ export default function Page() {
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
                 {MONTH_NAMES[visibleMonth]} {visibleYear}
               </p>
+              <button
+                id="btn-print-month-section"
+                onClick={() => setFlyerModalOpen(true)}
+                className="flex items-center gap-1.5 rounded-full border border-[#cbd2e5] bg-white px-3 py-1 text-xs font-semibold text-[#17254e] hover:bg-[#edf0f8] hover:border-[#17254e] transition active:scale-95 shadow-2xs cursor-pointer"
+                title="Imprimir reporte / flyer del mes"
+              >
+                <Printer className="size-3.5 text-[#e87358]" />
+                <span>Imprimir Flyer</span>
+              </button>
             </div>
             {monthBirthdays.length > 0 ? (
               <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
@@ -1056,6 +1082,16 @@ export default function Page() {
         currentMonthName={MONTH_NAMES[visibleMonth]}
         currentYear={visibleYear}
         selectedDay={cardSelectedDay}
+      />
+
+      {/* ── Modal de Flyer / Reporte del Mes ── */}
+      <MonthlyFlyerModal
+        isOpen={flyerModalOpen}
+        onClose={() => setFlyerModalOpen(false)}
+        birthdays={monthBirthdays}
+        monthName={MONTH_NAMES[visibleMonth]}
+        monthIndex={visibleMonth}
+        year={visibleYear}
       />
 
       {/* ── Toasts ── */}
