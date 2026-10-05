@@ -176,8 +176,16 @@ export default function Page() {
   const [cardSelectedDay, setCardSelectedDay] = useState<number | null>(null)
   const [pendingCardOpen, setPendingCardOpen] = useState<{ list: Birthday[]; day: number | null } | null>(null)
 
-  // Monthly flyer modal state (disponible para imprimir/descargar el reporte del mes)
+  // Monthly flyer modal state (solo para el administrador)
   const [flyerModalOpen, setFlyerModalOpen] = useState(false)
+
+  const openFlyer = () => {
+    if (!isAdminLoggedIn) {
+      addToast('Solo el administrador puede imprimir o generar el flyer del mes.', 'error')
+      return
+    }
+    setFlyerModalOpen(true)
+  }
 
   const openGreetingCard = (initialList: Birthday[] = [], day: number | null = null) => {
     if (!isAdminLoggedIn) {
@@ -448,18 +456,6 @@ export default function Page() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {/* Botón Flyer del mes */}
-            <button
-              id="btn-monthly-flyer"
-              onClick={() => setFlyerModalOpen(true)}
-              className="flex items-center gap-2 rounded-full border border-[#cbd2e5] bg-white px-3 py-2 text-sm font-medium text-[#17254e] hover:border-[#17254e] hover:bg-[#edf0f8] active:scale-95 shadow-xs transition-all sm:px-4 cursor-pointer"
-              title={`Imprimir y descargar flyer oficial de los cumpleañeros de ${MONTH_NAMES[visibleMonth]}`}
-            >
-              <Printer className="size-4 text-[#e87358]" />
-              <span className="hidden sm:inline">Flyer del Mes</span>
-              <span className="sm:hidden">Flyer</span>
-            </button>
-
             {/* Botón Tarjeta: solo lo activa el administrador */}
             <button
               id="btn-greeting-card"
@@ -589,15 +585,6 @@ export default function Page() {
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
                 {MONTH_NAMES[visibleMonth]} {visibleYear}
               </p>
-              <button
-                id="btn-print-month-section"
-                onClick={() => setFlyerModalOpen(true)}
-                className="flex items-center gap-1.5 rounded-full border border-[#cbd2e5] bg-white px-3 py-1 text-xs font-semibold text-[#17254e] hover:bg-[#edf0f8] hover:border-[#17254e] transition active:scale-95 shadow-2xs cursor-pointer"
-                title="Imprimir reporte / flyer del mes"
-              >
-                <Printer className="size-3.5 text-[#e87358]" />
-                <span>Imprimir Flyer</span>
-              </button>
             </div>
             {monthBirthdays.length > 0 ? (
               <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
@@ -826,6 +813,15 @@ export default function Page() {
                       </button>
                     )}
                   </div>
+                  <button
+                    id="btn-admin-flyer"
+                    onClick={openFlyer}
+                    className="flex items-center gap-1.5 rounded-xl border border-[#cbd2e5] bg-white px-3.5 py-2.5 text-sm font-semibold text-[#17254e] hover:bg-[#edf0f8] transition shrink-0 shadow-xs cursor-pointer"
+                    title={`Ver e imprimir el Flyer oficial de ${MONTH_NAMES[visibleMonth]}`}
+                  >
+                    <Printer className="size-4 text-[#e87358]" />
+                    <span>Flyer del Mes</span>
+                  </button>
                   <button
                     id="btn-add-birthday"
                     onClick={() => openAdd()}
@@ -1073,7 +1069,7 @@ export default function Page() {
         </div>
       )}
 
-      {/* ── Modal de Tarjeta de Felicitación ── */}
+      {/* ── Modal de Tarjeta de Felicitación (Solo Admin) ── */}
       <GreetingCardModal
         isOpen={cardModalOpen}
         onClose={() => setCardModalOpen(false)}
@@ -1082,6 +1078,7 @@ export default function Page() {
         currentMonthName={MONTH_NAMES[visibleMonth]}
         currentYear={visibleYear}
         selectedDay={cardSelectedDay}
+        onOpenFlyer={openFlyer}
       />
 
       {/* ── Modal de Flyer / Reporte del Mes ── */}

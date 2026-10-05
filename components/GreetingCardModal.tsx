@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Type,
   Palette,
+  Printer,
   Users,
 } from 'lucide-react'
 
@@ -28,6 +29,7 @@ interface GreetingCardModalProps {
   currentMonthName?: string
   currentYear?: number
   selectedDay?: number | null
+  onOpenFlyer?: () => void
 }
 
 const COLOR_PRESETS = [
@@ -50,6 +52,7 @@ export default function GreetingCardModal({
   currentMonthName = 'este mes',
   currentYear = new Date().getFullYear(),
   selectedDay = null,
+  onOpenFlyer,
 }: GreetingCardModalProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const templateImgRef = useRef<HTMLImageElement | null>(null)
@@ -387,6 +390,21 @@ export default function GreetingCardModal({
                 <X className="size-5" />
               </button>
             </div>
+
+            {/* Acceso a Flyer / Reporte del Mes */}
+            {onOpenFlyer && (
+              <div className="mt-3.5">
+                <button
+                  type="button"
+                  onClick={onOpenFlyer}
+                  className="w-full flex items-center justify-center gap-2 rounded-xl border border-[#263b78]/25 bg-gradient-to-r from-[#f4f6fb] to-[#edf0f8] px-3.5 py-2.5 text-xs sm:text-sm font-semibold text-[#17254e] hover:bg-[#dfe5f3] hover:border-[#17254e] transition active:scale-[0.98] shadow-xs cursor-pointer"
+                  title="Abrir e imprimir el reporte mensual con todos los cumpleañeros"
+                >
+                  <Printer className="size-4 text-[#e87358]" />
+                  <span>Ver / Imprimir Flyer del Mes ({currentMonthName})</span>
+                </button>
+              </div>
+            )}
 
             {/* Presets rápidos */}
             <div className="mt-4 flex flex-col gap-1.5">
