@@ -618,6 +618,21 @@ export default function Page() {
           </div>
         </section>
 
+        {/* ── Botón Cerrar Sesión Admin (entre lista y calendario) ── */}
+        {isAdminLoggedIn && (
+          <div className="mx-auto mb-6 max-w-3xl flex justify-center">
+            <button
+              id="btn-logout-main"
+              onClick={logoutAdmin}
+              className="flex items-center gap-2 rounded-full border border-[#f5c4bb] bg-[#fef3f0] px-5 py-2.5 text-sm font-semibold text-[#b95b4b] shadow-sm transition-all hover:bg-[#fbe4de] hover:border-[#e87358] active:scale-95"
+              title="Cerrar sesión de administrador"
+            >
+              <LogOut className="size-4" />
+              Cerrar Sesión de Administrador
+            </button>
+          </div>
+        )}
+
         {/* ── Calendario ── */}
         <section className="mx-auto max-w-3xl">
           <div className="rounded-2xl border border-[#d9dce8] bg-white shadow-sm overflow-hidden">
