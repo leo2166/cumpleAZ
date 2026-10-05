@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
+  Cake,
   Calendar,
   ChevronLeft,
   ChevronRight,
@@ -433,7 +434,7 @@ export default function Page() {
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 lg:px-8">
           <div className="flex items-center gap-3">
             <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#e87358] text-white shadow-sm">
-              <Sparkles className="size-5" />
+              <Cake className="size-5" />
             </div>
             <div>
               <p className="text-sm font-semibold leading-tight text-[#17254e] sm:text-base">

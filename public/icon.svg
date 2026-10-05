@@ -1,26 +1,76 @@
-<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <style>
-    @media (prefers-color-scheme: light) {
-      .background { fill: black; }
-      .foreground { fill: white; }
-    }
-    @media (prefers-color-scheme: dark) {
-      .background { fill: white; }
-      .foreground { fill: black; }
-    }
-  </style>
-  <g clip-path="url(#clip0_7960_43945)">
-    <rect class="background" width="180" height="180" rx="37" />
-    <g style="transform: scale(95%); transform-origin: center">
-      <path class="foreground"
-        d="M101.141 53H136.632C151.023 53 162.689 64.6662 162.689 79.0573V112.904H148.112V79.0573C148.112 78.7105 148.098 78.3662 148.072 78.0251L112.581 112.898C112.701 112.902 112.821 112.904 112.941 112.904H148.112V126.672H112.941C98.5504 126.672 86.5638 114.891 86.5638 100.5V66.7434H101.141V100.5C101.141 101.15 101.191 101.792 101.289 102.422L137.56 66.7816C137.255 66.7563 136.945 66.7434 136.632 66.7434H101.141V53Z" />
-      <path class="foreground"
-        d="M65.2926 124.136L14 66.7372H34.6355L64.7495 100.436V66.7372H80.1365V118.47C80.1365 126.278 70.4953 129.958 65.2926 124.136Z" />
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="100%" height="100%">
   <defs>
-    <clipPath id="clip0_7960_43945">
-      <rect width="180" height="180" fill="white" />
-    </clipPath>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <linearGradient id="frostGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fdf2e9"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
+
+  <!-- Contenedor con esquinas redondeadas modernas tipo app icon -->
+  <rect width="128" height="128" rx="28" fill="url(#bgGrad)"/>
+
+  <!-- Plato base -->
+  <ellipse cx="64" cy="106" rx="46" ry="6" fill="#ffffff" opacity="0.95"/>
+  <ellipse cx="64" cy="105" rx="41" ry="4.5" fill="#f1f5f9"/>
+
+  <!-- Capa inferior del pastel -->
+  <path d="M26 80 Q26 76 31 76 L97 76 Q102 76 102 80 L102 96 Q102 103 64 103 Q26 103 26 96 Z" fill="url(#frostGrad)"/>
+  <!-- Franja decorativa crema central en capa inferior -->
+  <path d="M26 88 Q45 92 64 88 Q83 85 102 88 L102 96 Q102 103 64 103 Q26 103 26 96 Z" fill="#ffedd5"/>
+  <!-- Glaseado ondulado capa inferior -->
+  <path d="M26 80 C32 84 38 84 44 80 C50 84 56 84 62 80 C68 84 74 84 80 80 C86 84 92 84 102 80 L102 76 L26 76 Z" fill="#dc2626"/>
+
+  <!-- Capa superior del pastel -->
+  <path d="M35 54 Q35 50 39 50 L89 50 Q93 50 93 54 L93 72 Q93 77 64 77 Q35 77 35 72 Z" fill="url(#frostGrad)"/>
+  <!-- Glaseado ondulado capa superior -->
+  <path d="M35 54 C40 58 44 58 49 54 C54 58 59 58 64 54 C69 58 74 58 79 54 C84 58 88 58 93 54 L93 50 L35 50 Z" fill="#dc2626"/>
+  
+  <!-- Gotitas y chispitas decorativas -->
+  <circle cx="49" cy="61" r="2" fill="#dc2626"/>
+  <circle cx="79" cy="61.5" r="2" fill="#dc2626"/>
+  <circle cx="40" cy="92" r="1.8" fill="#3b82f6"/>
+  <circle cx="64" cy="95" r="1.8" fill="#10b981"/>
+  <circle cx="88" cy="92" r="1.8" fill="#f59e0b"/>
+
+  <!-- Velas -->
+  <!-- Vela 1 (Izquierda - Celeste) -->
+  <rect x="44" y="32" width="7" height="19" rx="3.5" fill="#38bdf8"/>
+  <path d="M44 37 L51 39" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M44 43 L51 45" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="47.5" y1="32" x2="47.5" y2="28" stroke="#334155" stroke-width="1.5"/>
+  <path d="M47.5 18 Q53 23 47.5 28 Q42 23 47.5 18 Z" fill="url(#flameGrad)" filter="url(#glow)"/>
+
+  <!-- Vela 2 (Centro - Rosa fucsia brillante) -->
+  <rect x="60.5" y="27" width="7" height="24" rx="3.5" fill="#f43f5e"/>
+  <path d="M60.5 32 L67.5 34" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M60.5 38 L67.5 40" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M60.5 44 L67.5 46" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="64" y1="27" x2="64" y2="23" stroke="#334155" stroke-width="1.5"/>
+  <path d="M64 12 Q70.5 18 64 23 Q57.5 18 64 12 Z" fill="url(#flameGrad)" filter="url(#glow)"/>
+
+  <!-- Vela 3 (Derecha - Morado violeta) -->
+  <rect x="77" y="32" width="7" height="19" rx="3.5" fill="#a855f7"/>
+  <path d="M77 37 L84 39" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M77 43 L84 45" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+  <line x1="80.5" y1="32" x2="80.5" y2="28" stroke="#334155" stroke-width="1.5"/>
+  <path d="M80.5 18 Q86 23 80.5 28 Q75 23 80.5 18 Z" fill="url(#flameGrad)" filter="url(#glow)"/>
+
+  <!-- Estrellitas brillantes / destellos festivos -->
+  <path d="M22 26 L23.5 30 L27.5 31.5 L23.5 33 L22 37 L20.5 33 L16.5 31.5 L20.5 30 Z" fill="#fef08a" opacity="0.95"/>
+  <path d="M106 28 L107.5 32 L111.5 33.5 L107.5 35 L106 39 L104.5 35 L100.5 33.5 L104.5 32 Z" fill="#fef08a" opacity="0.95"/>
+  <circle cx="18" cy="62" r="2" fill="#ffffff" opacity="0.8"/>
+  <circle cx="110" cy="64" r="2.5" fill="#ffffff" opacity="0.8"/>
 </svg>
