@@ -440,9 +440,6 @@ export default function Page() {
               <p className="text-sm font-semibold leading-tight text-[#17254e] sm:text-base">
                 Asociación de Jubilados y Pensionados CANTV Zulia
               </p>
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#a39a92]">
-                Jubilados del Zulia
-              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
