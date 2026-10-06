@@ -138,7 +138,7 @@ export default function MonthlyFlyerModal({
 
     // Cálculo dinámico proporcional: se adapta automáticamente tanto si hay 5 como si hay 50 cumpleañeros
     const rowHeight = Math.min(44, Math.floor(totalHeight / Math.max(maxRows, 12)))
-    const nameFontSize = Math.max(15, Math.min(21, Math.floor(rowHeight * 0.47)))
+    const nameFontSize = Math.max(18, Math.min(24, Math.floor(rowHeight * 0.54)))
     const dayFontSize = Math.max(12, Math.min(16, Math.floor(rowHeight * 0.39)))
 
     const renderColumn = (items: BirthdayItem[], colStartX: number, colWidth: number) => {
