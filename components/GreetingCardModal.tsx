@@ -79,6 +79,7 @@ export default function GreetingCardModal({
   const [selectedFont, setSelectedFont] = useState(FONT_PRESETS[0].font)
   const [fontSizeOffset, setFontSizeOffset] = useState(0) // ajuste relativo +/-
   const [yOffset, setYOffset] = useState(0) // ajuste vertical +/-
+  const [xOffset, setXOffset] = useState(0) // ajuste horizontal +/-
   const [copied, setCopied] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -149,7 +150,7 @@ export default function GreetingCardModal({
 
     // 3. Posición central según la plantilla seleccionada + ajuste manual
     const centerY = selectedTemplate.centerY + yOffset
-    const centerX = selectedTemplate.centerX
+    const centerX = selectedTemplate.centerX + xOffset
 
     // Tamaño de fuente adaptable según cantidad de líneas (1-4 personas)
     let baseFontSize = 36
@@ -201,7 +202,7 @@ export default function GreetingCardModal({
     // Reset de sombras
     ctx.shadowColor = 'transparent'
     ctx.shadowBlur = 0
-  }, [namesText, selectedColor, selectedFont, fontSizeOffset, yOffset, imageLoaded, selectedTemplate])
+  }, [namesText, selectedColor, selectedFont, fontSizeOffset, yOffset, xOffset, imageLoaded, selectedTemplate])
 
   // Redibujar ante cualquier cambio
   useEffect(() => {
@@ -583,10 +584,10 @@ export default function GreetingCardModal({
             </div>
 
             {/* Ajustes de tamaño y posición */}
-            <div className="mt-4 grid grid-cols-2 gap-3 p-3 rounded-xl bg-[#f8f6f3] border border-[#e9e3dc]">
+            <div className="mt-4 grid grid-cols-3 gap-2.5 p-3 rounded-xl bg-[#f8f6f3] border border-[#e9e3dc]">
               <div>
-                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1">
-                  Tamaño letra: {fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px
+                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
+                  Tamaño: {fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px
                 </label>
                 <input
                   type="range"
@@ -598,15 +599,28 @@ export default function GreetingCardModal({
                 />
               </div>
               <div>
-                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1">
-                  Posición vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
+                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
+                  Vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
                 </label>
                 <input
                   type="range"
-                  min="-30"
-                  max="30"
+                  min="-50"
+                  max="50"
                   value={yOffset}
                   onChange={e => setYOffset(Number(e.target.value))}
+                  className="w-full accent-[#e87358]"
+                />
+              </div>
+              <div>
+                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
+                  Horizontal: {xOffset > 0 ? `+${xOffset}` : xOffset}px
+                </label>
+                <input
+                  type="range"
+                  min="-100"
+                  max="100"
+                  value={xOffset}
+                  onChange={e => setXOffset(Number(e.target.value))}
                   className="w-full accent-[#e87358]"
                 />
               </div>
