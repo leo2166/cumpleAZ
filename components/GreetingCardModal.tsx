@@ -34,8 +34,8 @@ interface GreetingCardModalProps {
 
 // centerX/centerY = posición del bloque de nombres en el espacio en blanco de cada plantilla
 const TEMPLATE_PRESETS = [
-  // img2 - mariposa rosa: espacio blanco entre "Cumpleaños" y el párrafo inferior
-  { id: 'img2', label: 'Clásico',   src: '/img2.png',  centerX: 630, centerY: 460 },
+  // img2 - mariposa rosa: coordenadas originales que funcionaban
+  { id: 'img2', label: 'Clásico',   src: '/img2.png',  centerX: 540, centerY: 645 },
   // F2 - flores azules: espacio amplio debajo de "Feliz Cumpleaños" (izquierda)
   { id: 'F2',   label: 'Diseño 2', src: '/F2.png',   centerX: 350, centerY: 440 },
   // F3 - flores celestes con marco: zona blanca central
