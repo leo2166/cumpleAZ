@@ -34,18 +34,18 @@ interface GreetingCardModalProps {
 
 // centerX/centerY = posición del bloque de nombres en el espacio en blanco de cada plantilla
 const TEMPLATE_PRESETS = [
-  // img2 - mariposa rosa: posición calculada de la imagen de referencia
+  // img2 - mariposa rosa: espacio blanco a la derecha debajo de Cumpleaños
   { id: 'img2', label: 'Clásico',   src: '/img2.png',  centerX: 695, centerY: 500 },
-  // F2 - flores azules: espacio amplio debajo de "Feliz Cumpleaños" (izquierda)
-  { id: 'F2',   label: 'Diseño 2', src: '/F2.png',   centerX: 350, centerY: 440 },
-  // F3 - flores celestes con marco: zona blanca central
-  { id: 'F3',   label: 'Diseño 3', src: '/F3.png',   centerX: 540, centerY: 450 },
-  // F4 - flores blancas marco dorado: gran espacio blanco central
-  { id: 'F4',   label: 'Diseño 4', src: '/F4.png',   centerX: 540, centerY: 490 },
-  // F5 - Feliz Cumple con pastel: espacio entre titulo y texto
-  { id: 'F5',   label: 'Diseño 5', src: '/F5.png',   centerX: 500, centerY: 510 },
-  // F6 - igual layout que F5
-  { id: 'F6',   label: 'Diseño 6', src: '/F6.png',   centerX: 500, centerY: 510 },
+  // F2 - flores rosa y azul: espacio central entre Y:400 y Y:600
+  { id: 'F2',   label: 'Diseño 2', src: '/F2.png',   centerX: 540, centerY: 500 },
+  // F3 - marco floral celeste: amplio espacio central entre Y:200 y Y:560
+  { id: 'F3',   label: 'Diseño 3', src: '/F3.png',   centerX: 540, centerY: 400 },
+  // F4 - flores blancas y marco dorado: espacio central entre Y:340 y Y:580
+  { id: 'F4',   label: 'Diseño 4', src: '/F4.png',   centerX: 540, centerY: 460 },
+  // F5 - pastel de cumpleaños: espacio central entre Y:380 y Y:660
+  { id: 'F5',   label: 'Diseño 5', src: '/F5.png',   centerX: 540, centerY: 520 },
+  // F6 - globos dorados y blancos: espacio libre entre Y:465 y Y:665
+  { id: 'F6',   label: 'Diseño 6', src: '/F6.png',   centerX: 530, centerY: 565 },
 ]
 
 const COLOR_PRESETS = [
@@ -440,7 +440,11 @@ export default function GreetingCardModal({
                 {TEMPLATE_PRESETS.map(tpl => (
                   <button
                     key={tpl.id}
-                    onClick={() => setSelectedTemplate(tpl)}
+                    onClick={() => {
+                      setSelectedTemplate(tpl)
+                      setYOffset(0)
+                      setXOffset(0)
+                    }}
                     className={`relative flex flex-col items-center gap-1 rounded-xl border-2 p-1 transition ${
                       selectedTemplate.id === tpl.id
                         ? 'border-[#e87358] shadow-md scale-[1.03]'
@@ -584,45 +588,64 @@ export default function GreetingCardModal({
             </div>
 
             {/* Ajustes de tamaño y posición */}
-            <div className="mt-4 grid grid-cols-3 gap-2.5 p-3 rounded-xl bg-[#f8f6f3] border border-[#e9e3dc]">
-              <div>
-                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
-                  Tamaño: {fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px
-                </label>
-                <input
-                  type="range"
-                  min="-10"
-                  max="12"
-                  value={fontSizeOffset}
-                  onChange={e => setFontSizeOffset(Number(e.target.value))}
-                  className="w-full accent-[#e87358]"
-                />
+            <div className="mt-4 p-3 rounded-xl bg-[#f8f6f3] border border-[#e9e3dc]">
+              <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-[#e9e3dc]">
+                <span className="text-[11px] font-bold text-[#6f665f] uppercase tracking-wider">
+                  Ajuste Fino de Posición
+                </span>
+                {(yOffset !== 0 || xOffset !== 0 || fontSizeOffset !== 0) && (
+                  <button
+                    onClick={() => {
+                      setYOffset(0)
+                      setXOffset(0)
+                      setFontSizeOffset(0)
+                    }}
+                    className="text-[10px] font-semibold text-[#e87358] hover:underline cursor-pointer"
+                  >
+                    Restablecer al centro
+                  </button>
+                )}
               </div>
-              <div>
-                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
-                  Vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
-                </label>
-                <input
-                  type="range"
-                  min="-50"
-                  max="50"
-                  value={yOffset}
-                  onChange={e => setYOffset(Number(e.target.value))}
-                  className="w-full accent-[#e87358]"
-                />
-              </div>
-              <div>
-                <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
-                  Horizontal: {xOffset > 0 ? `+${xOffset}` : xOffset}px
-                </label>
-                <input
-                  type="range"
-                  min="-100"
-                  max="100"
-                  value={xOffset}
-                  onChange={e => setXOffset(Number(e.target.value))}
-                  className="w-full accent-[#e87358]"
-                />
+              <div className="grid grid-cols-3 gap-2.5">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
+                    Tamaño: {fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px
+                  </label>
+                  <input
+                    type="range"
+                    min="-14"
+                    max="16"
+                    value={fontSizeOffset}
+                    onChange={e => setFontSizeOffset(Number(e.target.value))}
+                    className="w-full accent-[#e87358]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
+                    Vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
+                  </label>
+                  <input
+                    type="range"
+                    min="-160"
+                    max="160"
+                    value={yOffset}
+                    onChange={e => setYOffset(Number(e.target.value))}
+                    className="w-full accent-[#e87358]"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
+                    Horizontal: {xOffset > 0 ? `+${xOffset}` : xOffset}px
+                  </label>
+                  <input
+                    type="range"
+                    min="-160"
+                    max="160"
+                    value={xOffset}
+                    onChange={e => setXOffset(Number(e.target.value))}
+                    className="w-full accent-[#e87358]"
+                  />
+                </div>
               </div>
             </div>
           </div>
