@@ -32,13 +32,20 @@ interface GreetingCardModalProps {
   onOpenFlyer?: () => void
 }
 
+// centerX/centerY = posición del bloque de nombres en el espacio en blanco de cada plantilla
 const TEMPLATE_PRESETS = [
-  { id: 'img2', label: 'Clásico', src: '/img2.png' },
-  { id: 'F2',   label: 'Diseño 2', src: '/F2.png' },
-  { id: 'F3',   label: 'Diseño 3', src: '/F3.png' },
-  { id: 'F4',   label: 'Diseño 4', src: '/F4.png' },
-  { id: 'F5',   label: 'Diseño 5', src: '/F5.png' },
-  { id: 'F6',   label: 'Diseño 6', src: '/F6.png' },
+  // img2 - mariposa rosa: espacio blanco entre titulo y el texto impreso
+  { id: 'img2', label: 'Clásico',   src: '/img2.png',  centerX: 650, centerY: 490 },
+  // F2 - flores azules: espacio amplio debajo de "Feliz Cumpleaños" (izquierda)
+  { id: 'F2',   label: 'Diseño 2', src: '/F2.png',   centerX: 350, centerY: 440 },
+  // F3 - flores celestes con marco: zona blanca central
+  { id: 'F3',   label: 'Diseño 3', src: '/F3.png',   centerX: 540, centerY: 450 },
+  // F4 - flores blancas marco dorado: gran espacio blanco central
+  { id: 'F4',   label: 'Diseño 4', src: '/F4.png',   centerX: 540, centerY: 490 },
+  // F5 - Feliz Cumple con pastel: espacio entre titulo y texto
+  { id: 'F5',   label: 'Diseño 5', src: '/F5.png',   centerX: 500, centerY: 510 },
+  // F6 - igual layout que F5
+  { id: 'F6',   label: 'Diseño 6', src: '/F6.png',   centerX: 500, centerY: 510 },
 ]
 
 const COLOR_PRESETS = [
@@ -140,50 +147,49 @@ export default function GreetingCardModal({
 
     if (lines.length === 0) return
 
-    // 3. Configuración de tipografía y espaciado dinámico
-    // El área disponible está entre Y ≈ 540 y Y ≈ 735 (centro Y ≈ 640)
-    const centerY = 645 + yOffset
-    const centerX = 540
+    // 3. Posición central según la plantilla seleccionada + ajuste manual
+    const centerY = selectedTemplate.centerY + yOffset
+    const centerX = selectedTemplate.centerX
 
-    // Tamaño de fuente base según cantidad de líneas
-    let baseFontSize = 32
-    let lineHeight = 42
+    // Tamaño de fuente adaptable según cantidad de líneas (1-4 personas)
+    let baseFontSize = 36
+    let lineHeight = 48
 
     if (lines.length === 1) {
+      baseFontSize = 44
+      lineHeight = 56
+    } else if (lines.length === 2) {
       baseFontSize = 38
       lineHeight = 50
-    } else if (lines.length === 2) {
-      baseFontSize = 34
-      lineHeight = 46
     } else if (lines.length === 3) {
+      baseFontSize = 34
+      lineHeight = 44
+    } else if (lines.length === 4) {
       baseFontSize = 30
       lineHeight = 40
-    } else if (lines.length === 4) {
-      baseFontSize = 28
-      lineHeight = 37
     } else if (lines.length <= 6) {
-      baseFontSize = 24
-      lineHeight = 32
+      baseFontSize = 26
+      lineHeight = 34
     } else {
-      baseFontSize = Math.max(16, 22 - (lines.length - 6))
-      lineHeight = Math.max(20, baseFontSize * 1.3)
+      baseFontSize = Math.max(18, 24 - (lines.length - 6))
+      lineHeight = Math.max(22, baseFontSize * 1.3)
     }
 
-    const finalFontSize = Math.max(14, baseFontSize + fontSizeOffset)
+    const finalFontSize = Math.max(16, baseFontSize + fontSizeOffset)
     const finalLineHeight = lineHeight * (finalFontSize / baseFontSize)
 
     ctx.fillStyle = selectedColor
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = `500 ${finalFontSize}px ${selectedFont}`
+    ctx.font = `600 ${finalFontSize}px ${selectedFont}`
 
-    // Sombra de texto muy suave para máxima legibilidad sobre fondo dorado
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.6)'
-    ctx.shadowBlur = 4
+    // Sombra suave para legibilidad
+    ctx.shadowColor = 'rgba(255, 255, 255, 0.7)'
+    ctx.shadowBlur = 5
     ctx.shadowOffsetX = 0
     ctx.shadowOffsetY = 1
 
-    // Calcular posición de inicio Y para que todo el bloque quede perfectamente centrado
+    // Centrar el bloque verticalmente en el espacio asignado
     const totalBlockHeight = (lines.length - 1) * finalLineHeight
     const startY = centerY - totalBlockHeight / 2
 
@@ -195,7 +201,7 @@ export default function GreetingCardModal({
     // Reset de sombras
     ctx.shadowColor = 'transparent'
     ctx.shadowBlur = 0
-  }, [namesText, selectedColor, selectedFont, fontSizeOffset, yOffset, imageLoaded])
+  }, [namesText, selectedColor, selectedFont, fontSizeOffset, yOffset, imageLoaded, selectedTemplate])
 
   // Redibujar ante cualquier cambio
   useEffect(() => {
