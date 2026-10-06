@@ -87,43 +87,43 @@ export default function MonthlyFlyerModal({
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
     ctx.drawImage(img, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
-    // 2. Título del mes en la cinta dorada superior (Y ≈ 202, centrado en X = 540)
+    // 2. Título del mes en la cinta dorada superior (Centro exacto: Y = 265, X = 540)
     ctx.save()
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#17254e' // Azul CANTV elegante con alto contraste sobre dorado
+    ctx.fillStyle = '#17254e' // Azul CANTV elegante de alto contraste sobre dorado
     ctx.shadowColor = 'rgba(255, 255, 255, 0.45)'
-    ctx.shadowBlur = 4
+    ctx.shadowBlur = 3
     ctx.shadowOffsetX = 0
     ctx.shadowOffsetY = 1
 
     const titleText = `${monthName.toUpperCase()} ${year}`
-    ctx.font = `bold 42px 'Playfair Display', Georgia, serif`
-    ctx.fillText(titleText, 540, 202)
+    ctx.font = `bold 38px 'Playfair Display', Georgia, serif`
+    ctx.fillText(titleText, 540, 265)
     ctx.restore()
 
-    // 3. Subtítulo en la barrita azul sobre el pergamino (Y ≈ 270)
+    // 3. Subtítulo en la pastilla azul redondeada sobre el pergamino (Centro exacto: Y = 365, X = 540)
     ctx.save()
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#f6d584' // Dorado claro sobre fondo azul
-    ctx.font = `600 17px Inter, system-ui, sans-serif`
-    ctx.letterSpacing = '2px'
-    ctx.fillText('CUMPLEAÑEROS DEL MES', 540, 270)
+    ctx.fillStyle = '#fce59f' // Dorado luminoso sobre azul oscuro
+    ctx.font = `bold 15px Inter, system-ui, sans-serif`
+    ctx.letterSpacing = '3px'
+    ctx.fillText('CUMPLEAÑEROS DEL MES', 540, 365)
     ctx.restore()
 
     // 4. Lista de cumpleañeros en las 2 columnas del pergamino
-    // Área útil del pergamino: Y de 325 a 1030 (alto: 705px)
+    // Área útil verificada: Y de 415 a 1075 (alto útil: 660px)
     // Columna 1 (Izquierda): X ≈ 75 a 515 (ancho ~440px)
     // Columna 2 (Derecha):   X ≈ 565 a 1005 (ancho ~440px)
-    const listStartY = 330
-    const listEndY = 1030
+    const listStartY = 415
+    const listEndY = 1075
     const totalHeight = listEndY - listStartY
 
     if (sorted.length === 0) {
       ctx.save()
       ctx.fillStyle = '#7a7067'
-      ctx.font = "italic 26px 'Playfair Display', Georgia, serif"
+      ctx.font = "italic 24px 'Playfair Display', Georgia, serif"
       ctx.textAlign = 'center'
       ctx.fillText('No hay cumpleañeros registrados en este mes.', 540, listStartY + 150)
       ctx.restore()
@@ -137,9 +137,9 @@ export default function MonthlyFlyerModal({
     const maxRows = Math.max(col1.length, col2.length, 1)
 
     // Cálculo dinámico proporcional: se adapta automáticamente tanto si hay 5 como si hay 50 cumpleañeros
-    const rowHeight = Math.min(46, Math.floor(totalHeight / Math.max(maxRows, 12)))
-    const nameFontSize = Math.max(13, Math.min(20, Math.floor(rowHeight * 0.44)))
-    const dayFontSize = Math.max(12, Math.min(18, Math.floor(rowHeight * 0.40)))
+    const rowHeight = Math.min(44, Math.floor(totalHeight / Math.max(maxRows, 12)))
+    const nameFontSize = Math.max(13, Math.min(19, Math.floor(rowHeight * 0.45)))
+    const dayFontSize = Math.max(12, Math.min(16, Math.floor(rowHeight * 0.39)))
 
     const renderColumn = (items: BirthdayItem[], colStartX: number, colWidth: number) => {
       items.forEach((item, index) => {
