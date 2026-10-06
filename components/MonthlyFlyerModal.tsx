@@ -107,7 +107,7 @@ export default function MonthlyFlyerModal({
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillStyle = '#fce59f' // Dorado luminoso sobre azul oscuro
-    ctx.font = `bold 15px Inter, system-ui, sans-serif`
+    ctx.font = `bold 17px Inter, system-ui, sans-serif`
     ctx.letterSpacing = '3px'
     ctx.fillText('CUMPLEAÑEROS DEL MES', 540, 365)
     ctx.restore()
@@ -138,7 +138,7 @@ export default function MonthlyFlyerModal({
 
     // Cálculo dinámico proporcional: se adapta automáticamente tanto si hay 5 como si hay 50 cumpleañeros
     const rowHeight = Math.min(44, Math.floor(totalHeight / Math.max(maxRows, 12)))
-    const nameFontSize = Math.max(13, Math.min(19, Math.floor(rowHeight * 0.45)))
+    const nameFontSize = Math.max(15, Math.min(21, Math.floor(rowHeight * 0.47)))
     const dayFontSize = Math.max(12, Math.min(16, Math.floor(rowHeight * 0.39)))
 
     const renderColumn = (items: BirthdayItem[], colStartX: number, colWidth: number) => {
