@@ -585,17 +585,6 @@ export default function Page() {
               <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#263b78]">
                 {MONTH_NAMES[visibleMonth]} {visibleYear}
               </p>
-              {isAdminLoggedIn && (
-                <button
-                  id="btn-open-flyer-box"
-                  onClick={openFlyer}
-                  className="flex items-center gap-1.5 rounded-lg border border-[#cbd2e5] bg-white px-2.5 py-1 text-xs font-semibold text-[#263b78] hover:bg-[#eef2f9] active:scale-95 transition shadow-2xs"
-                  title={`Generar e imprimir el flyer oficial de ${MONTH_NAMES[visibleMonth]}`}
-                >
-                  <Printer className="size-3.5" />
-                  <span>Flyer del Mes</span>
-                </button>
-              )}
             </div>
             {monthBirthdays.length > 0 ? (
               <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2">
@@ -750,18 +739,6 @@ export default function Page() {
               <div className="flex items-center gap-2">
                 {isAdminLoggedIn && adminView === 'list' && (
                   <>
-                    <button
-                      id="btn-header-to-flyer"
-                      onClick={() => {
-                        closeAdmin()
-                        openFlyer()
-                      }}
-                      className="flex items-center gap-1.5 rounded-xl border border-[#263b78] bg-[#f0f3fa] px-3 py-1.5 text-xs font-semibold text-[#263b78] hover:bg-[#e4ebf7] active:scale-95 transition"
-                      title={`Generar el flyer oficial de ${MONTH_NAMES[visibleMonth]}`}
-                    >
-                      <Printer className="size-3.5 text-[#263b78]" />
-                      <span>Flyer del Mes</span>
-                    </button>
                     <button
                       id="btn-header-to-card"
                       onClick={() => {
