@@ -32,6 +32,15 @@ interface GreetingCardModalProps {
   onOpenFlyer?: () => void
 }
 
+const TEMPLATE_PRESETS = [
+  { id: 'img2', label: 'Clásico', src: '/img2.png' },
+  { id: 'F2',   label: 'Diseño 2', src: '/F2.png' },
+  { id: 'F3',   label: 'Diseño 3', src: '/F3.png' },
+  { id: 'F4',   label: 'Diseño 4', src: '/F4.png' },
+  { id: 'F5',   label: 'Diseño 5', src: '/F5.png' },
+  { id: 'F6',   label: 'Diseño 6', src: '/F6.png' },
+]
+
 const COLOR_PRESETS = [
   { id: 'gold', label: 'Dorado Cálido', value: '#78532f' },
   { id: 'navy', label: 'Azul CANTV', value: '#17254e' },
@@ -66,6 +75,8 @@ export default function GreetingCardModal({
   const [copied, setCopied] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATE_PRESETS[0])
+  const [loadingTemplate, setLoadingTemplate] = useState(false)
 
   // Formatear nombres en líneas de texto
   const formatNames = useCallback((items: BirthdayItem[]) => {
@@ -87,16 +98,22 @@ export default function GreetingCardModal({
     }
   }, [isOpen, initialBirthdays, formatNames])
 
-  // Cargar imagen plantilla img2.png una sola vez
+  // Cargar plantilla cuando cambia la selección
   useEffect(() => {
+    setImageLoaded(false)
+    setLoadingTemplate(true)
     const img = new Image()
     img.crossOrigin = 'anonymous'
-    img.src = '/img2.png'
+    img.src = selectedTemplate.src
     img.onload = () => {
       templateImgRef.current = img
       setImageLoaded(true)
+      setLoadingTemplate(false)
     }
-  }, [])
+    img.onerror = () => {
+      setLoadingTemplate(false)
+    }
+  }, [selectedTemplate])
 
   // Dibujar tarjeta en el Canvas
   const drawCard = useCallback(() => {
@@ -405,6 +422,46 @@ export default function GreetingCardModal({
                 </button>
               </div>
             )}
+
+            {/* ── Selector de Plantilla ── */}
+            <div className="mt-4 flex flex-col gap-2">
+              <span className="text-xs font-semibold text-[#292523] flex items-center gap-1.5">
+                <Palette className="size-3.5 text-[#78532f]" />
+                Diseño de la tarjeta:
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {TEMPLATE_PRESETS.map(tpl => (
+                  <button
+                    key={tpl.id}
+                    onClick={() => setSelectedTemplate(tpl)}
+                    className={`relative flex flex-col items-center gap-1 rounded-xl border-2 p-1 transition ${
+                      selectedTemplate.id === tpl.id
+                        ? 'border-[#e87358] shadow-md scale-[1.03]'
+                        : 'border-[#ded7cf] hover:border-[#e87358]/50 hover:scale-[1.02]'
+                    }`}
+                    title={tpl.label}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={tpl.src}
+                      alt={tpl.label}
+                      className="w-full aspect-square object-cover rounded-lg bg-[#f4f2ee]"
+                      loading="lazy"
+                    />
+                    <span className={`text-[10px] font-semibold truncate w-full text-center ${
+                      selectedTemplate.id === tpl.id ? 'text-[#e87358]' : 'text-[#6f665f]'
+                    }`}>
+                      {selectedTemplate.id === tpl.id ? '✓ ' : ''}{tpl.label}
+                    </span>
+                    {loadingTemplate && selectedTemplate.id === tpl.id && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-xl">
+                        <RefreshCw className="size-4 animate-spin text-[#e87358]" />
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Presets rápidos */}
             <div className="mt-4 flex flex-col gap-1.5">
