@@ -46,6 +46,10 @@ const TEMPLATE_PRESETS = [
   { id: 'F5',   label: 'Diseño 5', src: '/F5.png',   centerX: 540, centerY: 520 },
   // F6 - globos dorados y blancos: espacio libre entre Y:465 y Y:665
   { id: 'F6',   label: 'Diseño 6', src: '/F6.png',   centerX: 530, centerY: 565 },
+  // newf1 - marco dorado navideño: espacio blanco central entre Y:380 y Y:640
+  { id: 'newf1', label: 'Navidad',  src: '/newf1.png', centerX: 540, centerY: 510 },
+  // newf2 - globos y confetti fiesta: espacio blanco central entre Y:380 y Y:650
+  { id: 'newf2', label: 'Fiesta',   src: '/newf2.png', centerX: 540, centerY: 520 },
 ]
 
 const COLOR_PRESETS = [
@@ -436,7 +440,7 @@ export default function GreetingCardModal({
                 <Palette className="size-3.5 text-[#78532f]" />
                 Diseño de la tarjeta:
               </span>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 {TEMPLATE_PRESETS.map(tpl => (
                   <button
                     key={tpl.id}
