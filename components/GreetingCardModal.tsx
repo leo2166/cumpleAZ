@@ -48,8 +48,8 @@ const TEMPLATE_PRESETS = [
   { id: 'F6',   label: 'Diseño 6', src: '/F6.png',   centerX: 530, centerY: 565 },
   // newf1 - marco dorado navideño: espacio blanco central entre Y:380 y Y:640
   { id: 'newf1', label: 'Navidad',  src: '/newf1.png', centerX: 540, centerY: 510 },
-  // newf2 - globos y confetti fiesta: espacio blanco central entre Y:380 y Y:650
-  { id: 'newf2', label: 'Fiesta',   src: '/newf2.png', centerX: 540, centerY: 520 },
+  // newf3 - marco dorado globos y pasteles: espacio blanco central entre Y:440 y Y:680
+  { id: 'newf3', label: 'Fiesta',   src: '/newf3.png', centerX: 540, centerY: 555 },
 ]
 
 const COLOR_PRESETS = [
