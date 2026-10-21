@@ -444,18 +444,19 @@ export default function Page() {
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-10 border-b border-[#e9e3dc] bg-white/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#e87358] text-white shadow-sm">
-              <Cake className="size-5" />
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-3 py-3 sm:px-5 sm:py-4 lg:px-8">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 pr-2">
+            <div className="flex size-9 sm:size-10 shrink-0 items-center justify-center rounded-xl bg-[#e87358] text-white shadow-sm">
+              <Cake className="size-4 sm:size-5" />
             </div>
-            <div>
-              <p className="text-sm font-semibold leading-tight text-[#17254e] sm:text-base">
-                Asociación de Jubilados y Pensionados CANTV Zulia
+            <div className="min-w-0">
+              <p className="text-xs sm:text-base font-semibold leading-tight text-[#17254e] truncate sm:whitespace-normal">
+                <span className="hidden sm:inline">Asociación de Jubilados y Pensionados CANTV Zulia</span>
+                <span className="sm:hidden">Jubilados CANTV Zulia</span>
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Botón Tarjeta: solo lo activa el administrador */}
             <button
               id="btn-greeting-card"
@@ -465,7 +466,7 @@ export default function Page() {
                   openGreetingCard(todayBirthdays)
                 }
               }}
-              className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold transition-all sm:px-4 ${
+              className={`flex items-center gap-1.5 sm:gap-2 rounded-full border px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold transition-all ${
                 isAdminLoggedIn
                   ? 'border-[#78532f] bg-[#fbf5ee] text-[#78532f] hover:bg-[#f6ebd9] active:scale-95 shadow-xs cursor-pointer'
                   : 'border-[#ded7cf] bg-[#f4f2ee] text-[#a39a92] cursor-not-allowed opacity-60'
@@ -477,9 +478,9 @@ export default function Page() {
               }
             >
               {isAdminLoggedIn ? (
-                <Sparkles className="size-4 text-[#e87358]" />
+                <Sparkles className="size-3.5 sm:size-4 text-[#e87358]" />
               ) : (
-                <LockKeyhole className="size-3.5 text-[#a39a92]" />
+                <LockKeyhole className="size-3 sm:size-3.5 text-[#a39a92]" />
               )}
               <span className="hidden sm:inline">
                 {isAdminLoggedIn ? 'Tarjeta de Felicitación' : 'Tarjeta (Solo Admin)'}
@@ -487,20 +488,36 @@ export default function Page() {
               <span className="sm:hidden">Tarjeta</span>
             </button>
 
+            {/* Botón Administrar / Panel Admin */}
             <button
               id="btn-admin"
               onClick={openAdmin}
-              className={`flex items-center gap-2 rounded-full border px-3 py-2 text-sm font-medium transition-all sm:px-4 ${
+              className={`flex items-center gap-1.5 sm:gap-2 rounded-full border px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium transition-all ${
                 isAdminLoggedIn
                   ? 'border-[#3f8f5b] bg-[#f0f9f3] text-[#2c6e43] hover:bg-[#e3f4e8]'
                   : 'border-[#ded7cf] text-[#6f665f] hover:border-[#e87358] hover:text-[#e87358]'
               }`}
+              title={isAdminLoggedIn ? 'Abrir Panel de Administrador' : 'Acceso de Administrador'}
             >
-              <Settings2 className="size-4" />
+              <Settings2 className="size-3.5 sm:size-4" />
               <span className="hidden sm:inline">
                 {isAdminLoggedIn ? 'Panel Admin' : 'Administrar'}
               </span>
             </button>
+
+            {/* Botón Salida (Cerrar Sesión) - Visible cuando el administrador está conectado */}
+            {isAdminLoggedIn && (
+              <button
+                id="btn-logout-header"
+                onClick={logoutAdmin}
+                className="flex items-center gap-1 sm:gap-1.5 rounded-full border border-[#f5c4bb] bg-[#fef3f0] px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-semibold text-[#b95b4b] shadow-xs transition-all hover:bg-[#fbe4de] hover:border-[#e87358] active:scale-95"
+                title="Cerrar sesión de administrador"
+                aria-label="Cerrar sesión de administrador"
+              >
+                <LogOut className="size-3.5 sm:size-4 text-[#d9483b]" />
+                <span className="hidden sm:inline">Salir</span>
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -618,20 +635,6 @@ export default function Page() {
           </div>
         </section>
 
-        {/* ── Botón Cerrar Sesión Admin (entre lista y calendario) ── */}
-        {isAdminLoggedIn && (
-          <div className="mx-auto mb-6 max-w-3xl flex justify-center">
-            <button
-              id="btn-logout-main"
-              onClick={logoutAdmin}
-              className="flex items-center gap-2 rounded-full border border-[#f5c4bb] bg-[#fef3f0] px-5 py-2.5 text-sm font-semibold text-[#b95b4b] shadow-sm transition-all hover:bg-[#fbe4de] hover:border-[#e87358] active:scale-95"
-              title="Cerrar sesión de administrador"
-            >
-              <LogOut className="size-4" />
-              Cerrar Sesión de Administrador
-            </button>
-          </div>
-        )}
 
         {/* ── Calendario ── */}
         <section className="mx-auto max-w-3xl">
