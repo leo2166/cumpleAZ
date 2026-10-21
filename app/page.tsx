@@ -179,6 +179,26 @@ export default function Page() {
   // Monthly flyer modal state (solo para el administrador)
   const [flyerModalOpen, setFlyerModalOpen] = useState(false)
 
+  // Exit application modal state
+  const [showExitModal, setShowExitModal] = useState(false)
+  const [hasExited, setHasExited] = useState(false)
+
+  const handleExitApp = () => {
+    setShowExitModal(true)
+  }
+
+  const confirmExitApp = () => {
+    if (isAdminLoggedIn) {
+      logoutAdmin()
+    }
+    setShowExitModal(false)
+    setHasExited(true)
+    try {
+      window.open('', '_self')
+      window.close()
+    } catch {}
+  }
+
   const openFlyer = () => {
     if (!isAdminLoggedIn) {
       addToast('Solo el administrador puede imprimir o generar el flyer del mes.', 'error')
@@ -439,6 +459,46 @@ export default function Page() {
   const isCurrentMonthAndYear =
     visibleMonth === today.getMonth() && visibleYear === today.getFullYear()
 
+  // Si el usuario confirmó salir
+  if (hasExited) {
+    return (
+      <main className="min-h-screen bg-[#fbfaf8] flex flex-col items-center justify-center p-6 text-center">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[#e9e3dc] shadow-xl flex flex-col items-center">
+          <div className="size-16 rounded-2xl bg-[#fef3f0] border border-[#f5c4bb] flex items-center justify-center text-3xl mb-4 shadow-xs">
+            👋
+          </div>
+          <h1 className="text-2xl font-serif font-bold text-[#17254e] mb-2">
+            ¡Hasta pronto!
+          </h1>
+          <p className="text-sm text-[#5d6680] mb-6 leading-relaxed">
+            Has salido de la aplicación de la <strong>Asociación de Jubilados y Pensionados CANTV Zulia</strong>.
+            <br className="hidden sm:inline" />
+            {' '}Ya puedes cerrar tranquilamente esta pestaña en tu navegador.
+          </p>
+          <div className="flex flex-col gap-2.5 w-full">
+            <button
+              onClick={() => {
+                try {
+                  window.open('', '_self')
+                  window.close()
+                } catch {}
+              }}
+              className="w-full py-3 px-4 rounded-xl bg-[#d9483b] text-white font-semibold text-sm hover:bg-[#b9382c] transition shadow-xs cursor-pointer"
+            >
+              Cerrar Pestaña Ahora
+            </button>
+            <button
+              onClick={() => setHasExited(false)}
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-medium text-[#78532f] hover:bg-[#fbf5ee] transition cursor-pointer"
+            >
+              Volver a la página principal
+            </button>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-[#fbfaf8] text-[#292523]">
 
@@ -505,19 +565,17 @@ export default function Page() {
               </span>
             </button>
 
-            {/* Botón Salida (Cerrar Sesión) - Visible cuando el administrador está conectado */}
-            {isAdminLoggedIn && (
-              <button
-                id="btn-logout-header"
-                onClick={logoutAdmin}
-                className="flex items-center gap-1 sm:gap-1.5 rounded-full border border-[#f5c4bb] bg-[#fef3f0] px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-semibold text-[#b95b4b] shadow-xs transition-all hover:bg-[#fbe4de] hover:border-[#e87358] active:scale-95"
-                title="Cerrar sesión de administrador"
-                aria-label="Cerrar sesión de administrador"
-              >
-                <LogOut className="size-3.5 sm:size-4 text-[#d9483b]" />
-                <span className="hidden sm:inline">Salir</span>
-              </button>
-            )}
+            {/* Botón Salida - Visible SIEMPRE en PC y celular */}
+            <button
+              id="btn-logout-header"
+              onClick={handleExitApp}
+              className="flex items-center gap-1 sm:gap-1.5 rounded-full border border-[#f5c4bb] bg-[#fef3f0] px-2.5 py-1.5 sm:px-3.5 sm:py-2 text-xs sm:text-sm font-semibold text-[#b95b4b] shadow-xs transition-all hover:bg-[#fbe4de] hover:border-[#e87358] active:scale-95 cursor-pointer"
+              title={isAdminLoggedIn ? 'Cerrar sesión de administrador y salir' : 'Salir de la aplicación'}
+              aria-label="Salir de la aplicación"
+            >
+              <LogOut className="size-3.5 sm:size-4 text-[#d9483b]" />
+              <span className="hidden sm:inline">Salir</span>
+            </button>
           </div>
         </div>
       </header>
@@ -1108,6 +1166,40 @@ export default function Page() {
         monthIndex={visibleMonth}
         year={visibleYear}
       />
+
+      {/* ── Modal de Confirmación de Salida ── */}
+      {showExitModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
+          <div className="w-full max-w-sm rounded-3xl border border-[#e9e3dc] bg-white p-6 shadow-2xl text-center">
+            <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-[#fef3f0] border border-[#f5c4bb] text-2xl text-[#d9483b]">
+              <LogOut className="size-7" />
+            </div>
+            <h3 className="font-serif text-xl font-bold text-[#17254e] mb-2">
+              ¿Deseas salir?
+            </h3>
+            <p className="text-xs sm:text-sm text-[#5d6680] mb-6 leading-relaxed">
+              {isAdminLoggedIn
+                ? 'Se cerrará tu sesión de administrador de forma segura y podrás cerrar la página.'
+                : '¿Seguro que deseas salir de la aplicación de Jubilados y Pensionados CANTV Zulia?'}
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                id="btn-confirm-exit"
+                onClick={confirmExitApp}
+                className="w-full rounded-xl bg-[#d9483b] py-2.5 text-sm font-semibold text-white shadow-xs hover:bg-[#b9382c] active:scale-95 transition cursor-pointer"
+              >
+                Sí, Salir
+              </button>
+              <button
+                onClick={() => setShowExitModal(false)}
+                className="w-full rounded-xl border border-[#ded7cf] py-2 text-sm font-medium text-[#6f665f] hover:bg-[#f4f2ee] active:scale-95 transition cursor-pointer"
+              >
+                No, quedarme
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Toasts ── */}
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
