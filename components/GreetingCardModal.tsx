@@ -50,6 +50,12 @@ const TEMPLATE_PRESETS = [
   { id: 'newf1', label: 'Navidad',  src: '/newf1.png', centerX: 540, centerY: 510 },
   // newf3 - marco dorado globos y pasteles: espacio blanco central entre Y:440 y Y:680
   { id: 'newf3', label: 'Fiesta',   src: '/newf3.png', centerX: 540, centerY: 555 },
+  // azul - diseño en tonos azules
+  { id: 'azul', label: 'Azul', src: '/azul.png', centerX: 540, centerY: 580 },
+  // navidad_2 - diseño festivo navideño 2
+  { id: 'navidad_2', label: 'Navidad 2', src: '/navidad_2.png', centerX: 540, centerY: 500 },
+  // celebramos - marco claro de celebración
+  { id: 'celebramos', label: 'Celebramos', src: '/celebramos.jpg', centerX: 540, centerY: 535 },
 ]
 
 const COLOR_PRESETS = [
