@@ -57,25 +57,25 @@ const TEMPLATE_PRESETS = [
   // celebramos - marco claro de celebración
   { id: 'celebramos', label: 'Celebramos', src: '/celebramos.jpg', centerX: 540, centerY: 535 },
   // x1 - nuevo diseño 1
-  { id: 'x1', label: 'Nuevo 1', src: '/Nuevos dise%C3%B1os 061126/x1.png', centerX: 540, centerY: 500 },
+  { id: 'x1', label: 'x1', src: '/Nuevos dise%C3%B1os 061126/x1.png', centerX: 540, centerY: 500 },
   // x2 - nuevo diseño 2
-  { id: 'x2', label: 'Nuevo 2', src: '/Nuevos dise%C3%B1os 061126/x2.png', centerX: 540, centerY: 500 },
+  { id: 'x2', label: 'x2', src: '/Nuevos dise%C3%B1os 061126/x2.png', centerX: 540, centerY: 500 },
   // x3 - nuevo diseño 3
-  { id: 'x3', label: 'Nuevo 3', src: '/Nuevos dise%C3%B1os 061126/x3.png', centerX: 540, centerY: 500 },
+  { id: 'x3', label: 'x3', src: '/Nuevos dise%C3%B1os 061126/x3.png', centerX: 540, centerY: 500 },
   // x4 - nuevo diseño 4
-  { id: 'x4', label: 'Nuevo 4', src: '/Nuevos dise%C3%B1os 061126/x4.png', centerX: 540, centerY: 500 },
+  { id: 'x4', label: 'x4', src: '/Nuevos dise%C3%B1os 061126/x4.png', centerX: 540, centerY: 500 },
   // x5 - nuevo diseño 5
-  { id: 'x5', label: 'Nuevo 5', src: '/Nuevos dise%C3%B1os 061126/x5.png', centerX: 540, centerY: 500 },
+  { id: 'x5', label: 'x5', src: '/Nuevos dise%C3%B1os 061126/x5.png', centerX: 540, centerY: 500 },
   // x6 - nuevo diseño 6
-  { id: 'x6', label: 'Nuevo 6', src: '/Nuevos dise%C3%B1os 061126/x6.png', centerX: 540, centerY: 500 },
+  { id: 'x6', label: 'x6', src: '/Nuevos dise%C3%B1os 061126/x6.png', centerX: 540, centerY: 500 },
   // x7 - nuevo diseño 7
-  { id: 'x7', label: 'Nuevo 7', src: '/Nuevos dise%C3%B1os 061126/x7.png', centerX: 540, centerY: 500 },
+  { id: 'x7', label: 'x7', src: '/Nuevos dise%C3%B1os 061126/x7.png', centerX: 540, centerY: 500 },
   // x8 - nuevo diseño 8
-  { id: 'x8', label: 'Nuevo 8', src: '/Nuevos dise%C3%B1os 061126/x8.png', centerX: 540, centerY: 500 },
+  { id: 'x8', label: 'x8', src: '/Nuevos dise%C3%B1os 061126/x8.png', centerX: 540, centerY: 500 },
   // x9 - nuevo diseño 9
-  { id: 'x9', label: 'Nuevo 9', src: '/Nuevos dise%C3%B1os 061126/x9.png', centerX: 540, centerY: 500 },
+  { id: 'x9', label: 'x9', src: '/Nuevos dise%C3%B1os 061126/x9.png', centerX: 540, centerY: 500 },
   // x10 - nuevo diseño 10
-  { id: 'x10', label: 'Nuevo 10', src: '/Nuevos dise%C3%B1os 061126/x10.png', centerX: 540, centerY: 500 },
+  { id: 'x10', label: 'x10', src: '/Nuevos dise%C3%B1os 061126/x10.png', centerX: 540, centerY: 500 },
 ]
 
 const COLOR_PRESETS = [
