@@ -15,6 +15,13 @@ import {
   Users,
 } from 'lucide-react'
 
+import {
+  CARD_TEMPLATES,
+  CATEGORIES,
+  type CardCategory,
+  type CardTemplate,
+} from '@/lib/cardTemplates'
+
 export type BirthdayItem = {
   id?: number
   name: string
@@ -31,52 +38,6 @@ interface GreetingCardModalProps {
   selectedDay?: number | null
   onOpenFlyer?: () => void
 }
-
-// centerX/centerY = posición del bloque de nombres en el espacio en blanco de cada plantilla
-const TEMPLATE_PRESETS = [
-  // img2 - mariposa rosa: espacio blanco a la derecha debajo de Cumpleaños
-  { id: 'img2', label: 'Clásico',   src: '/img2.png',  centerX: 695, centerY: 500 },
-  // F2 - flores rosa y azul: espacio central entre Y:400 y Y:600
-  { id: 'F2',   label: 'Diseño 2', src: '/F2.png',   centerX: 540, centerY: 500 },
-  // F3 - marco floral celeste: amplio espacio central entre Y:200 y Y:560
-  { id: 'F3',   label: 'Diseño 3', src: '/F3.png',   centerX: 540, centerY: 400 },
-  // F4 - flores blancas y marco dorado: espacio central entre Y:340 y Y:580
-  { id: 'F4',   label: 'Diseño 4', src: '/F4.png',   centerX: 540, centerY: 460 },
-  // F5 - pastel de cumpleaños: espacio central entre Y:380 y Y:660
-  { id: 'F5',   label: 'Diseño 5', src: '/F5.png',   centerX: 540, centerY: 520 },
-  // F6 - globos dorados y blancos: espacio libre entre Y:465 y Y:665
-  { id: 'F6',   label: 'Diseño 6', src: '/F6.png',   centerX: 530, centerY: 565 },
-  // newf1 - marco dorado navideño: espacio blanco central entre Y:380 y Y:640
-  { id: 'newf1', label: 'Navidad',  src: '/newf1.png', centerX: 540, centerY: 510 },
-  // newf3 - marco dorado globos y pasteles: espacio blanco central entre Y:440 y Y:680
-  { id: 'newf3', label: 'Fiesta',   src: '/newf3.png', centerX: 540, centerY: 555 },
-  // azul - diseño en tonos azules
-  { id: 'azul', label: 'Azul', src: '/azul.png', centerX: 540, centerY: 580 },
-  // navidad_2 - diseño festivo navideño 2
-  { id: 'navidad_2', label: 'Navidad 2', src: '/navidad_2.png', centerX: 540, centerY: 500 },
-  // celebramos - marco claro de celebración
-  { id: 'celebramos', label: 'Celebramos', src: '/celebramos.jpg', centerX: 540, centerY: 535 },
-  // x1 - nuevo diseño 1
-  { id: 'x1', label: 'x1', src: '/Nuevos dise%C3%B1os 061126/x1.png', centerX: 540, centerY: 500 },
-  // x2 - nuevo diseño 2
-  { id: 'x2', label: 'x2', src: '/Nuevos dise%C3%B1os 061126/x2.png', centerX: 540, centerY: 500 },
-  // x3 - nuevo diseño 3
-  { id: 'x3', label: 'x3', src: '/Nuevos dise%C3%B1os 061126/x3.png', centerX: 540, centerY: 500 },
-  // x4 - nuevo diseño 4
-  { id: 'x4', label: 'x4', src: '/Nuevos dise%C3%B1os 061126/x4.png', centerX: 540, centerY: 500 },
-  // x5 - nuevo diseño 5
-  { id: 'x5', label: 'x5', src: '/Nuevos dise%C3%B1os 061126/x5.png', centerX: 540, centerY: 500 },
-  // x6 - nuevo diseño 6
-  { id: 'x6', label: 'x6', src: '/Nuevos dise%C3%B1os 061126/x6.png', centerX: 540, centerY: 500 },
-  // x7 - nuevo diseño 7
-  { id: 'x7', label: 'x7', src: '/Nuevos dise%C3%B1os 061126/x7.png', centerX: 540, centerY: 500 },
-  // x8 - nuevo diseño 8
-  { id: 'x8', label: 'x8', src: '/Nuevos dise%C3%B1os 061126/x8.png', centerX: 540, centerY: 500 },
-  // x9 - nuevo diseño 9
-  { id: 'x9', label: 'x9', src: '/Nuevos dise%C3%B1os 061126/x9.png', centerX: 540, centerY: 500 },
-  // x10 - nuevo diseño 10
-  { id: 'x10', label: 'x10', src: '/Nuevos dise%C3%B1os 061126/x10.png', centerX: 540, centerY: 500 },
-]
 
 const COLOR_PRESETS = [
   { id: 'gold', label: 'Dorado Cálido', value: '#78532f' },
@@ -113,8 +74,15 @@ export default function GreetingCardModal({
   const [copied, setCopied] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [downloading, setDownloading] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATE_PRESETS[0])
+  const [selectedTemplate, setSelectedTemplate] = useState<CardTemplate>(CARD_TEMPLATES[0])
+  const [selectedCategory, setSelectedCategory] = useState<CardCategory>('todas')
   const [loadingTemplate, setLoadingTemplate] = useState(false)
+
+  // Filtrar plantillas según la categoría seleccionada
+  const filteredTemplates = useMemo(() => {
+    if (selectedCategory === 'todas') return CARD_TEMPLATES
+    return CARD_TEMPLATES.filter(tpl => tpl.category === selectedCategory)
+  }, [selectedCategory])
 
   // Formatear nombres en líneas de texto
   const formatNames = useCallback((items: BirthdayItem[]) => {
@@ -460,47 +428,75 @@ export default function GreetingCardModal({
               </div>
             )}
 
-            {/* ── Selector de Plantilla ── */}
+            {/* ── Selector de Plantilla con Categorías y Scroll Suave ── */}
             <div className="mt-4 flex flex-col gap-2">
-              <span className="text-xs font-semibold text-[#292523] flex items-center gap-1.5">
-                <Palette className="size-3.5 text-[#78532f]" />
-                Diseño de la tarjeta:
-              </span>
-              <div className="grid grid-cols-4 gap-2">
-                {TEMPLATE_PRESETS.map(tpl => (
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-[#292523] flex items-center gap-1.5">
+                  <Palette className="size-3.5 text-[#78532f]" />
+                  Diseño de la tarjeta:
+                </span>
+                <span className="text-[11px] text-[#81776e]">
+                  {filteredTemplates.length} {filteredTemplates.length === 1 ? 'diseño' : 'diseños'}
+                </span>
+              </div>
+
+              {/* Filtro por categorías */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+                {CATEGORIES.map(cat => (
                   <button
-                    key={tpl.id}
-                    onClick={() => {
-                      setSelectedTemplate(tpl)
-                      setYOffset(0)
-                      setXOffset(0)
-                    }}
-                    className={`relative flex flex-col items-center gap-1 rounded-xl border-2 p-1 transition ${
-                      selectedTemplate.id === tpl.id
-                        ? 'border-[#e87358] shadow-md scale-[1.03]'
-                        : 'border-[#ded7cf] hover:border-[#e87358]/50 hover:scale-[1.02]'
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setSelectedCategory(cat.id)}
+                    className={`whitespace-nowrap px-2.5 py-1 rounded-full text-[11px] font-medium transition cursor-pointer ${
+                      selectedCategory === cat.id
+                        ? 'bg-[#17254e] text-white shadow-xs'
+                        : 'bg-[#f4f2ee] text-[#6f665f] hover:bg-[#eae6e1] hover:text-[#292523]'
                     }`}
-                    title={tpl.label}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={tpl.src}
-                      alt={tpl.label}
-                      className="w-full aspect-square object-cover rounded-lg bg-[#f4f2ee]"
-                      loading="lazy"
-                    />
-                    <span className={`text-[10px] font-semibold truncate w-full text-center ${
-                      selectedTemplate.id === tpl.id ? 'text-[#e87358]' : 'text-[#6f665f]'
-                    }`}>
-                      {selectedTemplate.id === tpl.id ? '✓ ' : ''}{tpl.label}
-                    </span>
-                    {loadingTemplate && selectedTemplate.id === tpl.id && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-xl">
-                        <RefreshCw className="size-4 animate-spin text-[#e87358]" />
-                      </div>
-                    )}
+                    {cat.label}
                   </button>
                 ))}
+              </div>
+
+              {/* Contenedor con altura fija y scroll suave (soporta N plantillas fluidamente) */}
+              <div className="max-h-56 overflow-y-auto pr-1 rounded-xl border border-[#ede7e0] bg-[#faf8f5] p-2">
+                <div className="grid grid-cols-4 gap-2">
+                  {filteredTemplates.map(tpl => (
+                    <button
+                      key={tpl.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTemplate(tpl)
+                        setYOffset(0)
+                        setXOffset(0)
+                      }}
+                      className={`relative flex flex-col items-center gap-1 rounded-xl border-2 p-1 transition cursor-pointer bg-white ${
+                        selectedTemplate.id === tpl.id
+                          ? 'border-[#e87358] shadow-md scale-[1.03]'
+                          : 'border-[#ded7cf] hover:border-[#e87358]/50 hover:scale-[1.02]'
+                      }`}
+                      title={tpl.label}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={tpl.src}
+                        alt={tpl.label}
+                        className="w-full aspect-square object-cover rounded-lg bg-[#f4f2ee]"
+                        loading="lazy"
+                      />
+                      <span className={`text-[10px] font-semibold truncate w-full text-center ${
+                        selectedTemplate.id === tpl.id ? 'text-[#e87358]' : 'text-[#6f665f]'
+                      }`}>
+                        {selectedTemplate.id === tpl.id ? '✓ ' : ''}{tpl.label}
+                      </span>
+                      {loadingTemplate && selectedTemplate.id === tpl.id && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-white/70 rounded-xl">
+                          <RefreshCw className="size-4 animate-spin text-[#e87358]" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
