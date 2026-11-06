@@ -42,13 +42,18 @@ interface GreetingCardModalProps {
 const COLOR_PRESETS = [
   { id: 'gold', label: 'Dorado Cálido', value: '#78532f' },
   { id: 'navy', label: 'Azul CANTV', value: '#17254e' },
+  { id: 'electric', label: 'Azul Eléctrico', value: '#0055ff' },
+  { id: 'wine', label: 'Vino Tinto', value: '#6b1426' },
+  { id: 'bright-gold', label: 'Oro Brillante', value: '#c59020' },
   { id: 'bronze', label: 'Bronce Oscuro', value: '#5b3a1a' },
   { id: 'black', label: 'Ébano Suave', value: '#292523' },
+  { id: 'white', label: 'Blanco Puro', value: '#ffffff' },
 ]
 
 const FONT_PRESETS = [
-  { id: 'serif', label: 'Serif (Playfair Display)', font: 'Playfair Display, Georgia, serif' },
+  { id: 'serif', label: 'Serif (Playfair)', font: 'Playfair Display, Georgia, serif' },
   { id: 'sans', label: 'Sans (Inter)', font: 'Inter, system-ui, sans-serif' },
+  { id: 'script', label: 'Caligráfica (Dancing)', font: '"Dancing Script", cursive' },
 ]
 
 export default function GreetingCardModal({
@@ -180,13 +185,21 @@ export default function GreetingCardModal({
     ctx.fillStyle = selectedColor
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.font = `600 ${finalFontSize}px ${selectedFont}`
+    const fontWeight = selectedFont.includes('Dancing Script') ? 700 : 600
+    ctx.font = `${fontWeight} ${finalFontSize}px ${selectedFont}`
 
-    // Sombra suave para legibilidad
-    ctx.shadowColor = 'rgba(255, 255, 255, 0.7)'
-    ctx.shadowBlur = 5
-    ctx.shadowOffsetX = 0
-    ctx.shadowOffsetY = 1
+    // Sombra suave para legibilidad (clara para tonos oscuros, oscura para blanco)
+    if (selectedColor.toLowerCase() === '#ffffff') {
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'
+      ctx.shadowBlur = 6
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 1
+    } else {
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.7)'
+      ctx.shadowBlur = 5
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 1
+    }
 
     // Centrar el bloque verticalmente en el espacio asignado
     const totalBlockHeight = (lines.length - 1) * finalLineHeight
@@ -202,9 +215,14 @@ export default function GreetingCardModal({
     ctx.shadowBlur = 0
   }, [namesText, selectedColor, selectedFont, fontSizeOffset, posY, posX, imageLoaded, selectedTemplate])
 
-  // Redibujar ante cualquier cambio
+  // Redibujar ante cualquier cambio y cuando las fuentes web hayan terminado de cargar
   useEffect(() => {
     drawCard()
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(() => {
+        drawCard()
+      })
+    }
   }, [drawCard])
 
   // Cerrar al pulsar Escape
@@ -596,14 +614,15 @@ export default function GreetingCardModal({
                 <Type className="size-3.5 text-[#263b78]" />
                 Tipografía:
               </span>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 {FONT_PRESETS.map(f => (
                   <button
                     key={f.id}
+                    type="button"
                     onClick={() => setSelectedFont(f.font)}
-                    className={`px-3 py-2 rounded-xl border text-xs text-center transition ${
+                    className={`px-2 py-2 rounded-xl border text-[11px] font-medium text-center transition cursor-pointer truncate ${
                       selectedFont === f.font
-                        ? 'border-[#263b78] bg-[#edf0f8] text-[#17254e] font-semibold'
+                        ? 'border-[#263b78] bg-[#edf0f8] text-[#17254e] font-semibold shadow-xs'
                         : 'border-[#ded7cf] bg-white text-[#6f665f] hover:bg-[#fbfaf8]'
                     }`}
                   >
