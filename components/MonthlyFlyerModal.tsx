@@ -216,7 +216,7 @@ export default function MonthlyFlyerModal({
             document.fonts.load("bold 42px 'Playfair Display'"),
           ])
         }
-      } catch {}
+      } catch { }
       drawFlyer()
     }
     const timer = setTimeout(loadFontsAndDraw, 60)

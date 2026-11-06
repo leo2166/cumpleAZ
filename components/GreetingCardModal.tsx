@@ -69,8 +69,8 @@ export default function GreetingCardModal({
   const [selectedColor, setSelectedColor] = useState(COLOR_PRESETS[0].value)
   const [selectedFont, setSelectedFont] = useState(FONT_PRESETS[0].font)
   const [fontSizeOffset, setFontSizeOffset] = useState(0) // ajuste relativo +/-
-  const [yOffset, setYOffset] = useState(0) // ajuste vertical +/-
-  const [xOffset, setXOffset] = useState(0) // ajuste horizontal +/-
+  const [posY, setPosY] = useState(CARD_TEMPLATES[0].centerY) // posición absoluta Y en canvas
+  const [posX, setPosX] = useState(CARD_TEMPLATES[0].centerX) // posición absoluta X en canvas
   const [copied, setCopied] = useState(false)
   const [imageLoaded, setImageLoaded] = useState(false)
   const [downloading, setDownloading] = useState(false)
@@ -146,9 +146,9 @@ export default function GreetingCardModal({
 
     if (lines.length === 0) return
 
-    // 3. Posición central según la plantilla seleccionada + ajuste manual
-    const centerY = selectedTemplate.centerY + yOffset
-    const centerX = selectedTemplate.centerX + xOffset
+    // 3. Posición absoluta dentro del canvas (0-1080)
+    const centerY = posY
+    const centerX = posX
 
     // Tamaño de fuente adaptable según cantidad de líneas (1-4 personas)
     let baseFontSize = 36
@@ -200,7 +200,7 @@ export default function GreetingCardModal({
     // Reset de sombras
     ctx.shadowColor = 'transparent'
     ctx.shadowBlur = 0
-  }, [namesText, selectedColor, selectedFont, fontSizeOffset, yOffset, xOffset, imageLoaded, selectedTemplate])
+  }, [namesText, selectedColor, selectedFont, fontSizeOffset, posY, posX, imageLoaded, selectedTemplate])
 
   // Redibujar ante cualquier cambio
   useEffect(() => {
@@ -467,8 +467,8 @@ export default function GreetingCardModal({
                       type="button"
                       onClick={() => {
                         setSelectedTemplate(tpl)
-                        setYOffset(0)
-                        setXOffset(0)
+                        setPosY(tpl.centerY)
+                        setPosX(tpl.centerX)
                       }}
                       className={`relative flex flex-col items-center gap-1 rounded-xl border-2 p-1 transition cursor-pointer bg-white ${
                         selectedTemplate.id === tpl.id
@@ -617,13 +617,14 @@ export default function GreetingCardModal({
             <div className="mt-4 p-3 rounded-xl bg-[#f8f6f3] border border-[#e9e3dc]">
               <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-[#e9e3dc]">
                 <span className="text-[11px] font-bold text-[#6f665f] uppercase tracking-wider">
-                  Ajuste Fino de Posición
+                  Ajuste Fino de Posición (Lienzo 1080 × 1080)
                 </span>
-                {(yOffset !== 0 || xOffset !== 0 || fontSizeOffset !== 0) && (
+                {(posY !== selectedTemplate.centerY || posX !== selectedTemplate.centerX || fontSizeOffset !== 0) && (
                   <button
+                    type="button"
                     onClick={() => {
-                      setYOffset(0)
-                      setXOffset(0)
+                      setPosY(selectedTemplate.centerY)
+                      setPosX(selectedTemplate.centerX)
                       setFontSizeOffset(0)
                     }}
                     className="text-[10px] font-semibold text-[#e87358] hover:underline cursor-pointer"
@@ -650,28 +651,30 @@ export default function GreetingCardModal({
                 {/* Desplazamiento vertical */}
                 <div className="flex items-center gap-3">
                   <label className="text-[11px] font-semibold text-[#6f665f] whitespace-nowrap w-36 shrink-0">
-                    Despl. vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
+                    Posición vertical: {posY}px
                   </label>
                   <input
                     type="range"
-                    min="-160"
-                    max="160"
-                    value={yOffset}
-                    onChange={e => setYOffset(Number(e.target.value))}
+                    min="0"
+                    max="1080"
+                    step="1"
+                    value={posY}
+                    onChange={e => setPosY(Number(e.target.value))}
                     className="flex-1 accent-[#e87358]"
                   />
                 </div>
                 {/* Desplazamiento horizontal */}
                 <div className="flex items-center gap-3">
                   <label className="text-[11px] font-semibold text-[#6f665f] whitespace-nowrap w-36 shrink-0">
-                    Despl. horizontal: {xOffset > 0 ? `+${xOffset}` : xOffset}px
+                    Posición horizontal: {posX}px
                   </label>
                   <input
                     type="range"
-                    min="-160"
-                    max="160"
-                    value={xOffset}
-                    onChange={e => setXOffset(Number(e.target.value))}
+                    min="0"
+                    max="1080"
+                    step="1"
+                    value={posX}
+                    onChange={e => setPosX(Number(e.target.value))}
                     className="flex-1 accent-[#e87358]"
                   />
                 </div>
