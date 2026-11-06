@@ -26,7 +26,6 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   { id: 'x4',  label: 'X4 Dorado',       src: '/x4.png',  centerX: 540, centerY: 375, category: 'nuevos' },
   { id: 'x5',  label: 'X5 Celebración',  src: '/x5.png',  centerX: 540, centerY: 470, category: 'nuevos' },
   { id: 'x6',  label: 'X6 Celeste',      src: '/x6.png',  centerX: 540, centerY: 475, category: 'nuevos' },
-  { id: 'x7',  label: 'X7 Azul Real',    src: '/x7.png',  centerX: 540, centerY: 460, category: 'nuevos' },
   { id: 'x8',  label: 'X8 Rosa Glam',    src: '/x8.png',  centerX: 540, centerY: 545, category: 'nuevos' },
   { id: 'x9',  label: 'X9 Festivo',      src: '/x9.png',  centerX: 540, centerY: 575, category: 'nuevos' },
   { id: 'x10', label: 'X10 CumpleAZ',    src: '/x10.png', centerX: 540, centerY: 470, category: 'nuevos' },
@@ -48,3 +47,4 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   { id: 'newf1',     label: 'Navidad 1', src: '/newf1.png',     centerX: 540, centerY: 510, category: 'navidad' },
   { id: 'navidad_2', label: 'Navidad 2', src: '/navidad_2.png', centerX: 540, centerY: 500, category: 'navidad' },
 ]
+
