@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Playfair_Display, Inter, Cormorant_Garamond, Dancing_Script } from 'next/font/google'
+import { Playfair_Display, Inter, Cormorant_Garamond, Dancing_Script, Roboto } from 'next/font/google'
 import './globals.css'
 
 const playfair = Playfair_Display({
@@ -29,6 +29,13 @@ const dancingScript = Dancing_Script({
   display: 'swap',
 })
 
+const roboto = Roboto({
+  subsets: ['latin'],
+  variable: '--font-roboto',
+  weight: ['400', '500', '700'],
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: 'Cumpleañeros | Jubilados del Zulia - Asociación CANTV',
   description: 'Calendario comunitario de cumpleaños de la Asociación de Jubilados y Pensionados CANTV del estado Zulia.',
@@ -52,7 +59,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${playfair.variable} ${inter.variable} ${cormorant.variable} ${dancingScript.variable}`}>
+    <html lang="es" className={`${playfair.variable} ${inter.variable} ${cormorant.variable} ${dancingScript.variable} ${roboto.variable}`}>
       <body className="antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

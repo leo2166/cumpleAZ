@@ -179,12 +179,12 @@ export default function MonthlyFlyerModal({
         ctx.stroke()
         ctx.restore()
 
-        // Nombre del cumpleañero (Tipografía Cormorant Garamond - Ultra elegante)
+        // Nombre del cumpleañero (Tipografía Roboto - Máxima legibilidad)
         ctx.save()
         ctx.textAlign = 'left'
         ctx.textBaseline = 'middle'
         ctx.fillStyle = '#17254e' // Azul Marino CANTV
-        ctx.font = `600 ${nameFontSize}px 'Cormorant Garamond', 'Playfair Display', Georgia, serif`
+        ctx.font = `600 ${nameFontSize}px 'Roboto', system-ui, sans-serif`
 
         let displayName = item.name.trim()
         const maxTextWidth = colWidth - 84
@@ -212,7 +212,7 @@ export default function MonthlyFlyerModal({
       try {
         if (typeof document !== 'undefined' && document.fonts) {
           await Promise.all([
-            document.fonts.load("600 20px 'Cormorant Garamond'"),
+            document.fonts.load("600 20px 'Roboto'"),
             document.fonts.load("bold 42px 'Playfair Display'"),
           ])
         }
