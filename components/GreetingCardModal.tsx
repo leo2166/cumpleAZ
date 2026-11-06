@@ -632,10 +632,11 @@ export default function GreetingCardModal({
                   </button>
                 )}
               </div>
-              <div className="grid grid-cols-3 gap-2.5">
-                <div>
-                  <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
-                    Tamaño: {fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px
+              <div className="flex flex-col gap-2.5">
+                {/* Tamaño de fuente */}
+                <div className="flex items-center gap-3">
+                  <label className="text-[11px] font-semibold text-[#6f665f] whitespace-nowrap w-36 shrink-0">
+                    Tamaño fuente: {fontSizeOffset > 0 ? `+${fontSizeOffset}` : fontSizeOffset}px
                   </label>
                   <input
                     type="range"
@@ -643,12 +644,13 @@ export default function GreetingCardModal({
                     max="16"
                     value={fontSizeOffset}
                     onChange={e => setFontSizeOffset(Number(e.target.value))}
-                    className="w-full accent-[#e87358]"
+                    className="flex-1 accent-[#e87358]"
                   />
                 </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
-                    Vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
+                {/* Desplazamiento vertical */}
+                <div className="flex items-center gap-3">
+                  <label className="text-[11px] font-semibold text-[#6f665f] whitespace-nowrap w-36 shrink-0">
+                    Despl. vertical: {yOffset > 0 ? `+${yOffset}` : yOffset}px
                   </label>
                   <input
                     type="range"
@@ -656,12 +658,13 @@ export default function GreetingCardModal({
                     max="160"
                     value={yOffset}
                     onChange={e => setYOffset(Number(e.target.value))}
-                    className="w-full accent-[#e87358]"
+                    className="flex-1 accent-[#e87358]"
                   />
                 </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-[#6f665f] block mb-1 truncate">
-                    Horizontal: {xOffset > 0 ? `+${xOffset}` : xOffset}px
+                {/* Desplazamiento horizontal */}
+                <div className="flex items-center gap-3">
+                  <label className="text-[11px] font-semibold text-[#6f665f] whitespace-nowrap w-36 shrink-0">
+                    Despl. horizontal: {xOffset > 0 ? `+${xOffset}` : xOffset}px
                   </label>
                   <input
                     type="range"
@@ -669,7 +672,7 @@ export default function GreetingCardModal({
                     max="160"
                     value={xOffset}
                     onChange={e => setXOffset(Number(e.target.value))}
-                    className="w-full accent-[#e87358]"
+                    className="flex-1 accent-[#e87358]"
                   />
                 </div>
               </div>
